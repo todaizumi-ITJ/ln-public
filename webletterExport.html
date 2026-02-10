@@ -36,6 +36,60 @@
       line-height: 1.6;
     }
 
+    /* ポータルに戻るボタン - 固定位置 */
+    .back-to-portal {
+      position: fixed;
+      z-index: 9999;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .back-to-portal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+      text-decoration: none;
+    }
+    .back-to-portal-top-left {
+      top: 20px;
+      left: 20px;
+    }
+    .back-to-portal-top-right {
+      top: 20px;
+      right: 20px;
+    }
+    .back-to-portal-bottom-left {
+      bottom: 20px;
+      left: 20px;
+    }
+    .back-to-portal-bottom-right {
+      bottom: 20px;
+      right: 20px;
+    }
+    @media (max-width: 768px) {
+      .back-to-portal {
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+      .back-to-portal-top-left,
+      .back-to-portal-bottom-left {
+        left: 10px;
+      }
+      .back-to-portal-top-right,
+      .back-to-portal-bottom-right {
+        right: 10px;
+      }
+    }
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -470,6 +524,11 @@
 </head>
 
 <body>
+  <!-- ポータルに戻るボタン（4箇所） -->
+  <a href="lnportal.html" class="back-to-portal back-to-portal-top-left">← ポータル</a>
+  <a href="lnportal.html" class="back-to-portal back-to-portal-top-right">ポータル →</a>
+  <a href="lnportal.html" class="back-to-portal back-to-portal-bottom-left">← ポータル</a>
+  <a href="lnportal.html" class="back-to-portal back-to-portal-bottom-right">ポータル →</a>
   <div class="container">
     <header>
       <h1>📮 Webレター作成 - 発信者情報開示請求書</h1>
