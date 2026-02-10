@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LNポータル システム紹介</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      overflow: hidden;
+    }
+
+    .presentation {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-content {
+      max-width: 1400px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .slide-image {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slide-text {
+      padding: 40px;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-text h2 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-text p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 15px;
+    }
+
+    .slide-text ul {
+      margin: 15px 0 15px 25px;
+      color: #cbd5e1;
+    }
+
+    .slide-text li {
+      margin-bottom: 10px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+
+    .controls button {
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      background: rgba(59, 130, 246, 0.8);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .controls button:hover {
+      background: rgba(59, 130, 246, 1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .controls button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+      transition: width 0.3s ease;
+    }
+
+    .slide-number {
+      position: fixed;
+      top: 30px;
+      right: 40px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #94a3b8;
+      z-index: 1000;
+    }
+
+    .title-slide {
+      text-align: center;
+    }
+
+    .title-slide h1 {
+      font-size: 64px;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title-slide p {
+      font-size: 24px;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .title-slide .subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 1200px) {
+      .slide-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="slide-number" id="slideNumber">1 / 7</div>
+
+  <div class="presentation">
+    <!-- タイトルスライド -->
+    <div class="slide active title-slide">
+      <div>
+        <h1>LNポータル</h1>
+        <p>発信者情報開示請求・裁判業務管理システム</p>
+        <p class="subtitle">効率化 × 自動化 × 可視化</p>
+      </div>
+    </div>
+
+    <!-- スライド1: トップページ -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-01-portal-top.png" alt="トップページ" class="slide-image">
+        <div class="slide-text">
+          <h2>📋 トップページ</h2>
+          <p>LNポータルシステムは、発信者情報開示請求や裁判業務を効率化するために開発されました。</p>
+          <p><strong>主な機能：</strong></p>
+          <ul>
+            <li><strong>ホーム</strong>：概要とサマリー</li>
+            <li><strong>LN一覧</strong>：案件の管理</li>
+            <li><strong>マニュアル</strong>：業務手順</li>
+            <li><strong>実績・レベル</strong>：進捗の可視化</li>
+          </ul>
+          <p>画面上部では、担当者を選択できます。各担当者には、レベルに応じた権限が付与されています。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド2: LN一覧 -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-02-ln-list.png" alt="LN一覧" class="slide-image">
+        <div class="slide-text">
+          <h2>📄 LN一覧画面</h2>
+          <p>すべての案件を一覧で確認できます。</p>
+          <ul>
+            <li><strong>全LN</strong>：すべての案件</li>
+            <li><strong>今日やること</strong>：本日対応が必要な案件</li>
+          </ul>
+          <p><strong>進捗状況の色分け：</strong></p>
+          <ul>
+            <li>🟢 緑：証拠収集完了</li>
+            <li>🟡 黄色：作業中</li>
+            <li>🔴 赤：未着手</li>
+          </ul>
+          <p>案件をクリックすると、詳細情報と証拠管理、Google Driveへのリンクが表示されます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド3: 申立書作成 -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-03-makeln.png" alt="申立書作成" class="slide-image">
+        <div class="slide-text">
+          <h2>📝 申立書作成管理センター</h2>
+          <p>申立書の自動生成が可能です。</p>
+          <p><strong>主な機能：</strong></p>
+          <ul>
+            <li>申立ての種類を選択（開示のみ、消去禁止、提供命令）</li>
+            <li>著作権証明パターンを選択</li>
+            <li>主張内容を入力</li>
+            <li>申立書を自動生成（PDF・Markdown）</li>
+          </ul>
+          <p>証拠説明書も自動生成できます。</p>
+          <p>著作権証明テンプレート集から、権利者ごとのパターンをコピーして使用できます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド4: マニュアル -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-04-manual.png" alt="マニュアル" class="slide-image">
+        <div class="slide-text">
+          <h2>📚 業務マニュアル</h2>
+          <p>レベル別に、実施すべき業務がまとめられています。</p>
+          <ul>
+            <li><strong>🛡️ beginner（初級）</strong>：証拠収集の基本業務</li>
+            <li><strong>⚔️ expert（中級）</strong>：LN確認、書類詰め</li>
+            <li><strong>🏰 leader（上級）</strong>：全体管理、高度な業務</li>
+          </ul>
+          <p>各項目は、アコーディオン形式で展開できます。</p>
+          <p>手順、注意点、チェックリストが詳しく記載されており、初めての方でも迷わず作業を進められます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド5: 実績・レベル -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-05-game.png" alt="実績・レベル" class="slide-image">
+        <div class="slide-text">
+          <h2>🎮 実績・レベル管理</h2>
+          <p>ゲーミフィケーションの仕組みで、日々の作業がポイントに変換されます。</p>
+          <ul>
+            <li><strong>マイページ</strong>：個人の実績とレベル</li>
+            <li><strong>日次レポート</strong>：本日の作業内容</li>
+            <li><strong>リーダーボード</strong>：チーム全体のランキング</li>
+          </ul>
+          <p>作業を完了すると、自動的にポイントが加算され、レベルアップします。</p>
+          <p>レベルが上がると、新しい権限と業務が解放されます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- スライド6: フィードバック -->
+    <div class="slide">
+      <div class="slide-content">
+        <img src="demo-screenshots/demo-06-feedback.png" alt="フィードバック管理" class="slide-image">
+        <div class="slide-text">
+          <h2>💬 フィードバック管理</h2>
+          <p>ユーザーからの改善提案、バグ報告、質問がすべてここに集約されます。</p>
+          <ul>
+            <li>種類別にフィルタリング可能</li>
+            <li>対応状況を一目で確認</li>
+            <li>すべてのページから簡単に投稿</li>
+          </ul>
+          <p>このシステムは、ユーザーの声を反映して、継続的に改善されています。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- エンディングスライド -->
+    <div class="slide title-slide">
+      <div>
+        <h1>ありがとうございました</h1>
+        <p>LNポータルシステム</p>
+        <p class="subtitle">効率化、自動化、可視化により、業務の質とスピードを大幅に向上</p>
+        <p style="margin-top: 40px; font-size: 16px;">ご不明な点があれば、いつでもフィードバックをお寄せください</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn" onclick="prevSlide()">← 前へ</button>
+    <button id="nextBtn" onclick="nextSlide()">次へ →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(n) {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (n + totalSlides) % totalSlides;
+      slides[currentSlide].classList.add('active');
+
+      document.getElementById('slideNumber').textContent = `${currentSlide + 1} / ${totalSlides}`;
+      document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    // キーボードショートカット
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      }
+    });
+
+    // 初期化
+    showSlide(0);
+  </script>
+</body>
+</html>
