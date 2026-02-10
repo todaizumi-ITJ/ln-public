@@ -541,7 +541,7 @@
     .biz-column-label { font-size: 15px; font-weight: 700; }
     .biz-column-desc { font-size: 11px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
     .biz-step-list { display: flex; flex-direction: column; gap: 8px; }
-    .biz-step { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+    .biz-step { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.7); transition: all 0.2s; border: 1px solid transparent; }
     .biz-step:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-color: var(--border); }
     .biz-step.locked { opacity: 0.35; cursor: default; pointer-events: none; }
     .biz-step.locked:hover { transform: none; box-shadow: none; }
@@ -550,6 +550,7 @@
     .biz-step-num.blue { background: var(--blue); }
     .biz-step-num.purple { background: var(--purple); }
     .biz-step-num.gray { background: var(--faint); }
+    .biz-step-content { flex: 1; min-width: 0; cursor: pointer; }
     .biz-step-info { flex: 1; min-width: 0; }
     .biz-step-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
     .biz-step-detail { font-size: 10px; color: var(--muted); line-height: 1.5; }
@@ -557,6 +558,8 @@
     .biz-step-badge.beginner { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
     .biz-step-badge.expert { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue); }
     .biz-step-badge.leader { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
+    .biz-step-feedback { font-size: 10px; padding: 4px 10px; background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue); border-radius: 6px; cursor: pointer; transition: all 0.2s; white-space: nowrap; align-self: flex-start; margin-top: 2px; font-weight: 600; }
+    .biz-step-feedback:hover { background: var(--blue); color: white; }
     .role-legend { display: flex; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 11px; color: var(--muted); flex-wrap: wrap; }
     .role-legend-item { display: flex; align-items: center; gap: 6px; }
     .role-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -752,45 +755,60 @@
               </div>
               <div class="biz-column-desc">各案件（LN）に必要な書類を集める作業。簡単なものから段階的に。</div>
               <div class="biz-step-list" id="collect-steps">
-                <div class="biz-step" data-min-role="beginner" onclick="showPanel('list'); setListTab('ready');">
+                <div class="biz-step" data-min-role="beginner">
                   <span class="biz-step-num green">A①</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">LN一覧を確認する</div>
-                    <div class="biz-step-detail">今日やるべきLNを一覧から見つけて選ぶ</div>
+                  <div class="biz-step-content" onclick="showPanel('list'); setListTab('ready');">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">A① LN一覧を確認する</div>
+                      <div class="biz-step-detail">今日やるべきLNを一覧から見つけて選ぶ</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge beginner">beginner〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('A① LN一覧を確認する'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="beginner" onclick="openDetailOrPrompt();">
+                <div class="biz-step" data-min-role="beginner">
                   <span class="biz-step-num green">A②</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">書類チェックリスト確認</div>
-                    <div class="biz-step-detail">LN詳細画面で必要書類が揃っているか確認する</div>
+                  <div class="biz-step-content" onclick="openDetailOrPrompt();">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">A② 書類チェックリスト確認</div>
+                      <div class="biz-step-detail">LN詳細画面で必要書類が揃っているか確認する</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge beginner">beginner〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('A② 書類チェックリスト確認'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="beginner" onclick="openDetailOrPrompt();">
+                <div class="biz-step" data-min-role="beginner">
                   <span class="biz-step-num green">A③</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">CSV・Driveフォルダ確認</div>
-                    <div class="biz-step-detail">ダウンロード済みファイルとフォルダ構成をチェック</div>
+                  <div class="biz-step-content" onclick="openDetailOrPrompt();">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">A③ CSV・Driveフォルダ確認</div>
+                      <div class="biz-step-detail">ダウンロード済みファイルとフォルダ構成をチェック</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge beginner">beginner〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('A③ CSV・Driveフォルダ確認'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="expert" onclick="showPanel('list'); setListTab('action');">
+                <div class="biz-step" data-min-role="expert">
                   <span class="biz-step-num blue">A④</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">不足書類の手配</div>
-                    <div class="biz-step-detail">委任状・住民票など未取得書類の依頼・催促</div>
+                  <div class="biz-step-content" onclick="showPanel('list'); setListTab('action');">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">A④ 不足書類の手配</div>
+                      <div class="biz-step-detail">委任状・住民票など未取得書類の依頼・催促</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge expert">expert〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('A④ 不足書類の手配'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="expert" onclick="window.open('lnmanual.html?task=box','_blank');">
+                <div class="biz-step" data-min-role="expert">
                   <span class="biz-step-num blue">A⑤</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">書類ボックス詰め</div>
-                    <div class="biz-step-detail">収集完了した書類を規定の順番で整理・格納</div>
+                  <div class="biz-step-content" onclick="window.open('lnmanual.html?task=box','_blank');">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">A⑤ 書類ボックス詰め</div>
+                      <div class="biz-step-detail">収集完了した書類を規定の順番で整理・格納</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge expert">expert〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('A⑤ 書類ボックス詰め'); return false;">フィードバック</button>
                 </div>
               </div>
             </div>
@@ -803,37 +821,49 @@
               </div>
               <div class="biz-column-desc">収集した情報をもとに、裁判所に提出する申立書を作成する作業。</div>
               <div class="biz-step-list" id="create-steps">
-                <div class="biz-step" data-min-role="expert" onclick="showPanel('list'); setListTab('ready');">
+                <div class="biz-step" data-min-role="expert">
                   <span class="biz-step-num blue">B①</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">申立書テンプレート利用</div>
-                    <div class="biz-step-detail">用意されたテンプレートにLN情報を流し込む</div>
+                  <div class="biz-step-content" onclick="showPanel('list'); setListTab('ready');">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">B① 申立書テンプレート利用</div>
+                      <div class="biz-step-detail">用意されたテンプレートにLN情報を流し込む</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge expert">expert〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('B① 申立書テンプレート利用'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="expert" onclick="openDetailOrPrompt();">
+                <div class="biz-step" data-min-role="expert">
                   <span class="biz-step-num blue">B②</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">証拠説明書の作成</div>
-                    <div class="biz-step-detail">証拠リストを整理し、説明書を自動生成</div>
+                  <div class="biz-step-content" onclick="openDetailOrPrompt();">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">B② 証拠説明書の作成</div>
+                      <div class="biz-step-detail">証拠リストを整理し、説明書を自動生成</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge expert">expert〜</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('B② 証拠説明書の作成'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="leader" onclick="openDetailOrPrompt();">
+                <div class="biz-step" data-min-role="leader">
                   <span class="biz-step-num purple">B③</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">内容確認・修正</div>
-                    <div class="biz-step-detail">生成された申立書の内容を精査し、必要に応じて修正</div>
+                  <div class="biz-step-content" onclick="openDetailOrPrompt();">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">B③ 内容確認・修正</div>
+                      <div class="biz-step-detail">生成された申立書の内容を精査し、必要に応じて修正</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge leader">leader</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('B③ 内容確認・修正'); return false;">フィードバック</button>
                 </div>
-                <div class="biz-step" data-min-role="leader" onclick="alert('モック: 最終提出フロー');">
+                <div class="biz-step" data-min-role="leader">
                   <span class="biz-step-num purple">B④</span>
-                  <div class="biz-step-info">
-                    <div class="biz-step-name">最終承認・提出</div>
-                    <div class="biz-step-detail">最終チェック後、裁判所への提出を承認する</div>
+                  <div class="biz-step-content" onclick="alert('モック: 最終提出フロー');">
+                    <div class="biz-step-info">
+                      <div class="biz-step-name">B④ 最終承認・提出</div>
+                      <div class="biz-step-detail">最終チェック後、裁判所への提出を承認する</div>
+                    </div>
                   </div>
                   <span class="biz-step-badge leader">leader</span>
+                  <button class="biz-step-feedback" onclick="event.stopPropagation(); openFeedbackModal('B④ 最終承認・提出'); return false;">フィードバック</button>
                 </div>
               </div>
             </div>
@@ -1176,11 +1206,15 @@
       }).join('');
     }
 
-    function openFeedbackModal() {
+    function openFeedbackModal(itemName) {
       const modal = document.getElementById('feedback-modal');
       const ta = document.getElementById('feedback-textarea');
+      const locationInput = document.getElementById('feedbackLocation');
       if (!modal || !ta) return;
       ta.value = currentDetailLn ? '[' + currentDetailLn + '] ' : '';
+      if (locationInput && itemName) {
+        locationInput.value = itemName;
+      }
       modal.style.display = 'flex';
       ta.focus();
     }
@@ -2274,8 +2308,9 @@
   </style>
 
   <!-- フィードバックボタン（固定） -->
-  <button class="feedback-float-btn" onclick="openFeedbackModal()" title="フィードバックを送信: P-99">
-    <span style="font-size:24px">💬</span>
+  <button class="feedback-float-btn" onclick="openFeedbackModal('全体フィードバック')" title="フィードバックを送信: P-99">
+    <span style="font-size:20px">💬</span>
+    <div style="font-size:10px; font-weight:600; margin-top:2px;">フィードバック</div>
     <span class="element-id" style="position:absolute;bottom:2px;right:2px;font-size:7px;padding:1px 3px;background:#fff;color:#3b82f6" title="要素ID: P-99">P-99</span>
   </button>
 
