@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webレター作成 - 発信者情報開示請求書</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #475569;
+      --radius: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--bg-card), #0f172a);
+      padding: 24px;
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .badge {
+      background: var(--primary);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* File Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .upload-text {
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .upload-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .upload-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Provider List */
+    .provider-list {
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .provider-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .provider-item:hover {
+      background: #475569;
+    }
+
+    .provider-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    .provider-name {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .provider-count {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Category List */
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-input);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .category-item input {
+      accent-color: var(--primary);
+    }
+
+    /* Date Filter */
+    .date-filter {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .date-filter input {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    /* Title Lookup */
+    .title-lookup {
+      margin-top: 12px;
+    }
+
+    .title-lookup textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+
+    .title-lookup-help {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #0d9488;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Main Content */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+    }
+
+    .stat-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    /* Preview Table */
+    .preview-container {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .preview-count {
+      color: var(--text-muted);
+    }
+
+    .preview-table-wrapper {
+      max-height: 500px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .preview-table th {
+      background: var(--bg-input);
+      padding: 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .preview-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .preview-table tr:hover td {
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .truncate {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary);
+    }
+
+    @media (max-width: 1024px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* 要素番号バッジ */
+    .element-id {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      color: #9ca3af;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 2px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      cursor: help;
+      transition: all 0.2s;
+    }
+    .element-id:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>📮 Webレター作成 - 発信者情報開示請求書</h1>
+      <p>プロバイダを選択してCSVをエクスポート。Webレターの差し込み印刷に対応。</p>
+    </header>
+
+    <div class="grid">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- File Upload -->
+        <div class="card">
+          <h3 class="card-title">📁 データ読み込み</h3>
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">CSVファイルをドラッグ＆ドロップ<br>または</p>
+            <button class="upload-btn">フォルダを選択<span class="element-id" title="要素ID: W-01">W-01</span></button>
+            <input type="file" id="fileInput" webkitdirectory multiple hidden>
+          </div>
+          <p id="uploadStatus" style="margin-top:12px; font-size:0.85rem; color:var(--text-muted);"></p>
+        </div>
+
+        <!-- Provider Selection -->
+        <div class="card">
+          <h3 class="card-title">
+            🏢 プロバイダ選択
+            <span class="badge" id="selectedProviderCount">0</span>
+          </h3>
+          <div class="provider-list" id="providerList">
+            <div class="empty-state" style="padding: 20px;">
+              <p>データを読み込んでください</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Selection -->
+        <div class="card">
+          <h3 class="card-title">📂 カテゴリ</h3>
+          <div class="category-list" id="categoryList">
+            <p style="color: var(--text-muted);">データを読み込んでください</p>
+          </div>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="card">
+          <h3 class="card-title">📅 日付フィルター</h3>
+          <div class="date-filter">
+            <input type="date" id="startDate" placeholder="開始日">
+            <span>〜</span>
+            <input type="date" id="endDate" placeholder="終了日">
+          </div>
+        </div>
+
+        <!-- Title Lookup -->
+        <div class="card">
+          <h3 class="card-title">📝 タイトルデータ（任意）</h3>
+          <div class="title-lookup">
+            <textarea id="titleData"
+              placeholder="品番,タイトル 形式で入力&#10;例:&#10;SKMJ349,お兄ちゃんの妹観察日記vol.2&#10;SKMJ355,ラブラブカップル同士が..."></textarea>
+            <p class="title-lookup-help">
+              品番とタイトルをカンマ区切りで入力すると、CSVにタイトルが追加されます。
+            </p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+          <h3 class="card-title">⚡ アクション</h3>
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="previewBtn" disabled>プレビュー<span class="element-id" title="要素ID: W-02">W-02</span></button>
+            <button class="btn btn-success" id="exportBtn" disabled>CSV出力<span class="element-id" title="要素ID: W-03">W-03</span></button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Stats -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-value" id="totalRecords">0</div>
+            <div class="stat-label">全レコード</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="filteredRecords">0</div>
+            <div class="stat-label">フィルター後</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="uniqueProducts">0</div>
+            <div class="stat-label">品番数</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="uniqueIPs">0</div>
+            <div class="stat-label">ユニークIP</div>
+          </div>
+        </div>
+
+        <!-- Preview Table -->
+        <div class="card preview-container">
+          <div class="preview-header">
+            <h3 class="card-title">📋 プレビュー</h3>
+            <span class="preview-count" id="previewCount"></span>
+          </div>
+
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <span>読み込み中...</span>
+          </div>
+
+          <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">📊</div>
+            <p>データを読み込み、プロバイダを選択してください</p>
+          </div>
+
+          <div class="preview-table-wrapper" id="previewWrapper" style="display:none;">
+            <table class="preview-table" id="previewTable">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>品番</th>
+                  <th>タイトル</th>
+                  <th>Infohash</th>
+                  <th>ISP</th>
+                  <th>IPアドレス</th>
+                  <th>ポート</th>
+                  <th>タイムスタンプ</th>
+                  <th>VIPN（仮）</th>
+                </tr>
+              </thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="providerMaster.js"></script>
+  <script src="webletterExport.js"></script>
+  <script>
+    // ============================================================
+    // Global State
+    // ============================================================
+    // webletterExport.js 側で宣言済みのため、ここでは再代入のみ行う
+    allRecords = [];
+    let titleMap = {};
+    let selectedProviders = new Set();
+    let selectedCategories = new Set();
+
+    // ============================================================
+    // DOM Elements
+    // ============================================================
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const providerList = document.getElementById('providerList');
+    const categoryList = document.getElementById('categoryList');
+    const previewBtn = document.getElementById('previewBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const loading = document.getElementById('loading');
+    const emptyState = document.getElementById('emptyState');
+    const previewWrapper = document.getElementById('previewWrapper');
+    const previewBody = document.getElementById('previewBody');
+
+    // ============================================================
+    // File Upload
+    // ============================================================
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const items = e.dataTransfer.items;
+      if (items) {
+        await processDataTransferItems(items);
+      }
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      await processFiles(files);
+    });
+
+    async function processDataTransferItems(items) {
+      const files = [];
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const entry = item.webkitGetAsEntry();
+          if (entry) {
+            await traverseFileTree(entry, files);
+          }
+        }
+      }
+      await processFiles(files);
+    }
+
+    async function traverseFileTree(entry, files, path = '') {
+      if (entry.isFile) {
+        const file = await new Promise(resolve => entry.file(resolve));
+        if (file.name.endsWith('.csv')) {
+          file._relativePath = path + file.name;
+          files.push(file);
+        }
+      } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        const entries = await new Promise(resolve => reader.readEntries(resolve));
+        for (const e of entries) {
+          await traverseFileTree(e, files, path + entry.name + '/');
+        }
+      }
+    }
+
+    async function processFiles(files) {
+      const csvFiles = files.filter(f => f.name.endsWith('.csv'));
+      if (csvFiles.length === 0) {
+        uploadStatus.textContent = 'CSVファイルが見つかりません';
+        return;
+      }
+
+      loading.classList.add('active');
+      emptyState.style.display = 'none';
+      uploadStatus.textContent = `${csvFiles.length}件のCSVを読み込み中...`;
+
+      allRecords = [];
+      let processed = 0;
+
+      for (const file of csvFiles) {
+        try {
+          const text = await readShiftJISFile(file);
+          const relativePath = file._relativePath || file.webkitRelativePath || file.name;
+          const pathParts = relativePath.split('/');
+
+          // Extract category, sourceType, productCode from path
+          let category = 'unknown';
+          let sourceType = 'isp';
+          let productCode = file.name.replace('.csv', '');
+
+          // Pattern: batchDate/category/sourceType/productCode.csv
+          if (pathParts.length >= 3) {
+            category = pathParts[pathParts.length - 3] || 'unknown';
+            sourceType = pathParts[pathParts.length - 2] || 'isp';
+          } else if (pathParts.length >= 2) {
+            category = pathParts[pathParts.length - 2] || 'unknown';
+          }
+
+          const records = parseCSV(text, category, sourceType, productCode);
+          allRecords.push(...records);
+
+          processed++;
+          uploadStatus.textContent = `処理中: ${processed}/${csvFiles.length}`;
+        } catch (err) {
+          console.error('Error reading file:', file.name, err);
+        }
+      }
+
+      loading.classList.remove('active');
+      uploadStatus.textContent = `✅ ${allRecords.length.toLocaleString()}件のレコードを読み込みました`;
+
+      updateUI();
+    }
+
+    // ============================================================
+    // UI Updates
+    // ============================================================
+    function updateUI() {
+      // Count by ISP
+      const ispCounts = countByISP(allRecords);
+      renderProviderList(ispCounts);
+
+      // Count by Category
+      const catCounts = countByCategory(allRecords);
+      renderCategoryList(catCounts);
+
+      // Update stats
+      document.getElementById('totalRecords').textContent = allRecords.length.toLocaleString();
+
+      // Enable buttons
+      previewBtn.disabled = allRecords.length === 0;
+      exportBtn.disabled = allRecords.length === 0;
+    }
+
+    function renderProviderList(ispCounts) {
+      const sorted = Object.entries(ispCounts).sort((a, b) => b[1] - a[1]);
+
+      if (sorted.length === 0) {
+        providerList.innerHTML = '<div class="empty-state" style="padding:20px;"><p>データがありません</p></div>';
+        return;
+      }
+
+      providerList.innerHTML = sorted.map(([isp, count]) => `
+        <label class="provider-item">
+          <input type="checkbox" value="${isp}">
+          <span class="provider-name">${isp}</span>
+          <span class="provider-count">${count.toLocaleString()}件</span>
+        </label>
+      `).join('');
+
+      // Add event listeners
+      providerList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateSelectedProviders);
+      });
+    }
+
+    function renderCategoryList(catCounts) {
+      const sorted = Object.entries(catCounts).sort((a, b) => a[0].localeCompare(b[0]));
+
+      if (sorted.length === 0) {
+        categoryList.innerHTML = '<p style="color: var(--text-muted);">データがありません</p>';
+        return;
+      }
+
+      categoryList.innerHTML = sorted.map(([cat, count]) => `
+        <label class="category-item">
+          <input type="checkbox" value="${cat}" checked>
+          <span>${cat}</span>
+          <span style="color:var(--text-muted);">(${count})</span>
+        </label>
+      `).join('');
+
+      // Initialize selected categories
+      selectedCategories = new Set(sorted.map(([cat]) => cat));
+
+      categoryList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCategories);
+      });
+    }
+
+    function updateSelectedProviders() {
+      selectedProviders.clear();
+      providerList.querySelectorAll('input:checked').forEach(cb => {
+        selectedProviders.add(cb.value);
+      });
+      document.getElementById('selectedProviderCount').textContent = selectedProviders.size;
+    }
+
+    function updateSelectedCategories() {
+      selectedCategories.clear();
+      categoryList.querySelectorAll('input:checked').forEach(cb => {
+        selectedCategories.add(cb.value);
+      });
+    }
+
+    // ============================================================
+    // Title Lookup
+    // ============================================================
+    function parseTitleData() {
+      const textarea = document.getElementById('titleData');
+      const lines = textarea.value.split('\n').filter(l => l.trim());
+      titleMap = {};
+
+      for (const line of lines) {
+        const [code, ...titleParts] = line.split(',');
+        if (code && titleParts.length > 0) {
+          titleMap[code.trim()] = titleParts.join(',').trim();
+        }
+      }
+    }
+
+    // ============================================================
+    // Preview & Export
+    // ============================================================
+    previewBtn.addEventListener('click', () => {
+      parseTitleData();
+      const filtered = getFilteredRecords();
+      renderPreview(filtered);
+    });
+
+    exportBtn.addEventListener('click', () => {
+      if (selectedProviders.size === 0) {
+        alert('プロバイダを選択してください');
+        return;
+      }
+
+      parseTitleData();
+
+      // Export per provider
+      for (const provider of selectedProviders) {
+        const filtered = getFilteredRecords().filter(r =>
+          normalizeISPName(r.ispName) === provider
+        );
+
+        if (filtered.length > 0) {
+          const csv = generateExportCSV(filtered, provider);
+          const filename = `webletter_${provider}_${formatDateForFilename(new Date())}.csv`;
+          downloadCSV(csv, filename);
+        }
+      }
+    });
+
+    function getFilteredRecords() {
+      const startDate = document.getElementById('startDate').value
+        ? new Date(document.getElementById('startDate').value)
+        : null;
+      const endDate = document.getElementById('endDate').value
+        ? new Date(document.getElementById('endDate').value)
+        : null;
+
+      return filterRecords(allRecords, {
+        isps: selectedProviders.size > 0 ? Array.from(selectedProviders) : null,
+        categories: selectedCategories.size > 0 ? Array.from(selectedCategories) : null,
+        startDate,
+        endDate
+      });
+    }
+
+    function renderPreview(records) {
+      if (records.length === 0) {
+        previewWrapper.style.display = 'none';
+        emptyState.style.display = 'flex';
+        emptyState.innerHTML = '<div class="empty-state-icon">🔍</div><p>条件に一致するデータがありません</p>';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      previewWrapper.style.display = 'block';
+
+      const limit = 100;
+      const displayRecords = records.slice(0, limit);
+
+      document.getElementById('previewCount').textContent =
+        `表示: ${displayRecords.length}件 / 全${records.length.toLocaleString()}件`;
+
+      document.getElementById('filteredRecords').textContent = records.length.toLocaleString();
+      document.getElementById('uniqueProducts').textContent =
+        new Set(records.map(r => r.productCode)).size.toLocaleString();
+      document.getElementById('uniqueIPs').textContent =
+        new Set(records.map(r => r.ip)).size.toLocaleString();
+
+      previewBody.innerHTML = displayRecords.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${r.productCode}</td>
+          <td class="truncate">${titleMap[r.productCode] || '（未設定）'}</td>
+          <td style="font-family:monospace;font-size:0.75rem;">${r.hash.substring(0, 12)}...</td>
+          <td>${normalizeISPName(r.ispName)}</td>
+          <td style="font-family:monospace;">${r.ip}</td>
+          <td>${r.port}</td>
+          <td>${r.timestamp}</td>
+          <td style="font-family:monospace;color:#f59e0b;">${generateVIPN(r)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function generateExportCSV(records, targetISP) {
+      const provider = typeof findProvider === 'function' ? findProvider(targetISP) : null;
+      const today = formatDate(new Date());
+
+      // CSV Header - VIPNを使用
+      const headers = [
+        '管理番号', '日付', '宛先会社名', '郵便番号', '住所', '部署',
+        '品番', 'タイトル', 'Infohash', 'IPアドレス', 'ポート番号', 'タイムスタンプ', 'VIPN（仮）'
+      ];
+
+      const lines = [headers.join(',')];
+
+      records.forEach((r, i) => {
+        const pnNumber = `PN${String(i + 1).padStart(5, '0')}`;
+        const vipn = generateVIPN(r);  // VIPNを生成
+
+        const row = [
+          pnNumber,
+          today,
+          provider ? `${provider.fullName} 御中` : targetISP,
+          provider ? provider.postalCode : '',
+          provider ? provider.address : '',
+          provider ? (provider.department || '') : '',
+          r.productCode,
+          titleMap[r.productCode] || '',
+          r.hash,
+          r.ip,
+          r.port,
+          r.timestamp,
+          vipn  // VIPN
+        ];
+
+        lines.push(row.map(v => escapeCSVField(String(v))).join(','));
+      });
+
+      return lines.join('\r\n');
+    }
+
+    // VIPN照合用CSVもダウンロード
+    function downloadVIPNMapping(records, providerName) {
+      const csv = generateVIPNMappingCSV(records);
+      const filename = `vipn_mapping_${providerName}_${formatDateForFilename(new Date())}.csv`;
+      downloadCSV(csv, filename);
+    }
+
+    function formatDateForFilename(date) {
+      return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    }
+  </script>
+
+<!-- ========== フィードバック機能 ========== -->
+<style>
+.feedback-float-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;box-shadow:0 4px 12px rgba(59,130,246,0.4);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;z-index:9998;transition:all .3s}
+.feedback-float-btn:hover{transform:scale(1.1)}
+.feedback-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center}
+.feedback-modal-overlay.active{display:flex}
+.feedback-modal-box{background:#fff;border-radius:16px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.feedback-modal-header{display:flex;justify-content:space-between;align-items:center;padding:24px 24px 16px;border-bottom:1px solid #e5e7eb}
+.feedback-modal-title{font-size:18px;font-weight:700}
+.feedback-modal-close{width:32px;height:32px;border-radius:8px;border:none;background:#f3f4f6;cursor:pointer;font-size:20px}
+.feedback-modal-body{padding:24px}
+.feedback-form-group{margin-bottom:20px}
+.feedback-form-label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.feedback-form-select,.feedback-form-input,.feedback-form-textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px}
+.feedback-form-textarea{min-height:120px;resize:vertical}
+.feedback-form-submit{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.feedback-status{margin-top:16px;padding:12px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;display:none}
+.feedback-status.success{background:#d1fae5;color:#065f46}
+</style>
+
+<button class="feedback-float-btn" onclick="document.getElementById('feedbackModalOverlay').classList.add('active');document.getElementById('feedbackLocation').value=document.title.split('—')[0].trim()" title="フィードバックを送信: W-99"><span style="font-size:24px">💬</span><span class="element-id" style="position:absolute;bottom:2px;right:2px;font-size:7px;padding:1px 3px;background:#fff;color:#3b82f6" title="要素ID: W-99">W-99</span></button>
+
+<div id="feedbackModalOverlay" class="feedback-modal-overlay" onclick="if(event.target.id==='feedbackModalOverlay')this.classList.remove('active')">
+  <div class="feedback-modal-box">
+    <div class="feedback-modal-header">
+      <div class="feedback-modal-title">💬 フィードバックを送信</div>
+      <button class="feedback-modal-close" onclick="document.getElementById('feedbackModalOverlay').classList.remove('active')">×</button>
+    </div>
+    <div class="feedback-modal-body">
+      <form onsubmit="event.preventDefault();var t=document.getElementById('feedbackType').value,l=document.getElementById('feedbackLocation').value,c=document.getElementById('feedbackContent').value.trim(),n=document.getElementById('feedbackName').value.trim();if(!c)return;var f={id:'fb_'+Date.now(),type:t,location:l||document.title,content:c,name:n||'匿名',timestamp:new Date().toISOString()};var fs=JSON.parse(localStorage.getItem('system_feedbacks')||'[]');fs.push(f);localStorage.setItem('system_feedbacks',JSON.stringify(fs));document.getElementById('feedbackStatus').className='feedback-status success';document.getElementById('feedbackStatus').textContent='✓ 送信しました！';document.getElementById('feedbackStatus').style.display='block';setTimeout(function(){document.getElementById('feedbackModalOverlay').classList.remove('active')},2000)">
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">種類</label>
+          <select id="feedbackType" class="feedback-form-select" required>
+            <option value="">選択</option>
+            <option value="bug">🐛 バグ</option>
+            <option value="improvement">💡 改善提案</option>
+            <option value="question">❓ 質問</option>
+            <option value="other">📝 その他</option>
+          </select>
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">ページ・機能名</label>
+          <input type="text" id="feedbackLocation" class="feedback-form-input">
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">詳細 *</label>
+          <textarea id="feedbackContent" class="feedback-form-textarea" required></textarea>
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">お名前（任意）</label>
+          <input type="text" id="feedbackName" class="feedback-form-input">
+        </div>
+        <button type="submit" class="feedback-form-submit">📤 送信</button>
+        <div id="feedbackStatus" class="feedback-status"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>実績・レベル — LNポータル</title>
+  <style>
+    :root {
+      --font: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      --ink: #1f2937; --muted: #6b7280; --faint: #9ca3af;
+      --surface: #ffffff; --surface2: #f9fafb; --border: #e5e7eb;
+      --blue: #2563eb; --blue-bg: #eff6ff;
+      --green: #059669; --green-bg: #ecfdf5;
+      --yellow: #d97706; --yellow-bg: #fffbeb;
+      --red: #dc2626; --red-bg: #fef2f2;
+      --purple: #7e3af2; --purple-bg: #f5f3ff;
+      --bg: #f9fafb; --sidebar-bg: #ffffff; --accent: #2563eb;
+      --amber: #d97706; --amber-bg: #fffbeb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background-color: var(--surface2); color: var(--ink); margin: 0; min-height: 100vh; }
+
+    /* Header */
+    .game-header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .game-header-title { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .game-header .back-link { font-size: 13px; color: var(--blue); text-decoration: none; font-weight: 600; }
+    .game-header .back-link:hover { text-decoration: underline; }
+    .game-header-right { display: flex; align-items: center; gap: 16px; }
+
+    /* Container */
+    .game-container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Tabs */
+    .game-tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+    .game-tab {
+      padding: 10px 18px; font-size: 13px; font-weight: 600; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2); cursor: pointer;
+      color: var(--muted); transition: all 0.2s;
+    }
+    .game-tab:hover { background: var(--border); color: var(--ink); }
+    .game-tab.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .card-head { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-title { font-size: 16px; font-weight: 700; }
+    .card-body { padding: 20px 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; font-family: var(--font); }
+    .btn-primary { background: var(--blue); color: white; border-color: var(--blue); }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary { background: var(--surface2); color: var(--ink); }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* Game panels */
+    .game-panel { display: none; }
+    .game-panel.active { display: block; }
+
+    /* Report styles */
+    .report-clear-banner {
+      background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%);
+      color: white; text-align: center; padding: 24px; border-radius: 16px;
+      margin-bottom: 24px; box-shadow: 0 8px 32px rgba(14,165,233,0.3);
+    }
+    .report-clear-banner h2 { font-size: 24px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .report-clear-banner .report-date { font-size: 13px; opacity: 0.9; }
+    .report-total-score { font-size: 48px; font-weight: 800; margin: 16px 0 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); font-family: monospace; }
+    .report-rank { font-size: 14px; font-weight: 600; letter-spacing: 0.1em; }
+    .report-role-card { background: var(--surface); border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .report-role-card.beginner { border-left: 5px solid var(--green); }
+    .report-role-card.expert { border-left: 5px solid var(--blue); }
+    .report-role-card.leader { border-left: 5px solid var(--purple); }
+    .report-role-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .report-role-title { font-size: 16px; font-weight: 700; }
+    .report-role-points { font-size: 24px; font-weight: 800; font-family: monospace; }
+    .report-role-card.beginner .report-role-points { color: var(--green); }
+    .report-role-card.expert .report-role-points { color: var(--blue); }
+    .report-role-card.leader .report-role-points { color: var(--purple); }
+    .report-task-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 6px; background: var(--surface2); border-radius: 8px; font-size: 13px; }
+    .report-task-item .task-ok { color: var(--green); font-size: 16px; }
+    .report-task-item .task-point { font-weight: 700; font-family: monospace; font-size: 12px; color: var(--muted); margin-left: auto; }
+    .report-empty { color: var(--faint); font-style: italic; padding: 16px; }
+
+    /* Leaderboard styles */
+    .leaderboard-stat-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); text-align: center; }
+    .leaderboard-stat-val { font-size: 28px; font-weight: 800; font-family: monospace; }
+    .leaderboard-stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .leaderboard-member-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); transition: all 0.2s; }
+    .leaderboard-member-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    /* Level & Promotion overview */
+    .level-overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 700px) { .level-overview-grid { grid-template-columns: 1fr; } }
+
+    /* Welcome stats */
+    .welcome-stats { display: flex; flex-wrap: wrap; gap: 10px; }
+    .welcome-stat { background: var(--surface); border-radius: 12px; padding: 14px 12px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
+    .welcome-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .welcome-stat-val { font-size: 24px; font-weight: 800; font-family: monospace; }
+    .welcome-stat-label { font-size: 10px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+
+    /* Expert path */
+    .expert-path-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .expert-path-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 8px 12px; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); }
+    .expert-path-item.done { background: var(--green-bg); border-color: rgba(34,197,94,0.3); color: var(--green); font-weight: 600; }
+    .expert-path-item:not(.done) { color: var(--muted); }
+
+    /* User selector */
+    .user-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: var(--font); background: var(--surface); }
+    
+    /* Report save button */
+    .save-report-btn:hover { background: #059669 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+    .save-report-btn:active { transform: translateY(0); }
+    
+    /* 要素番号バッジ */
+    .element-id {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      color: #9ca3af;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 2px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      cursor: help;
+      transition: all 0.2s;
+    }
+    .element-id:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-header">
+  <span class="game-header-title">🎮 実績・レベル</span>
+  <div class="game-header-right">
+    <select id="user-select" class="user-select" onchange="setUser(this.value)"></select>
+    <a href="lnportal.html" class="back-link">← ポータルに戻る</a>
+  </div>
+</div>
+
+<div class="game-container">
+  <div class="game-tabs">
+    <button class="game-tab active" data-panel="overview" onclick="showGamePanel('overview')">📊 マイページ<span class="element-id" title="要素ID: G-01">G-01</span></button>
+    <button class="game-tab" data-panel="report" onclick="showGamePanel('report')">📋 日次レポート<span class="element-id" title="要素ID: G-02">G-02</span></button>
+    <button class="game-tab" data-panel="leaderboard" onclick="showGamePanel('leaderboard')">🏆 リーダーボード<span class="element-id" title="要素ID: G-03">G-03</span></button>
+  </div>
+
+  <!-- ========== マイページ ========== -->
+  <div id="game-panel-overview" class="game-panel active">
+    <div class="level-overview-grid">
+      <div class="card">
+        <div class="card-head"><span class="card-title">📊 レベル・経験値</span></div>
+        <div class="card-body" id="overview-level-bar"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">🏆 昇格チェックリスト</span></div>
+        <div class="card-body" id="overview-promotion-card"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-head"><span class="card-title">📊 今月の成績</span></div>
+      <div class="card-body">
+        <div class="welcome-stats" id="overview-stats"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">🗺️ スキルパス</span></div>
+      <div class="card-body">
+        <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">①作業 → ②+pt → ③スキル → ④レベルアップ</p>
+        <div class="expert-path-list" id="overview-path-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 日次レポート ========== -->
+  <div id="game-panel-report" class="game-panel">
+    
+    <!-- 本日の報告記入欄 -->
+    <div class="card" style="margin-bottom: 20px; border: 2px solid var(--blue);">
+      <div class="card-head" style="background: var(--blue-bg);">
+        <span class="card-title">✍️ 本日の業務報告</span>
+        <button onclick="saveReport()" class="save-report-btn" style="background:#10b981;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s">💾 保存</button>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom: 16px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-primary)">📝 今日の作業内容</label>
+          <textarea id="report-work-content" placeholder="今日実施した作業の詳細を記入してください。&#10;例: LN 7K14488の申立書作成完了、証拠説明書を自動生成" style="width:100%;min-height:120px;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;line-height:1.6;resize:vertical"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-primary)">📢 伝達事項（共有したいこと）</label>
+          <textarea id="report-message" placeholder="チームへの連絡、質問、相談事項などを記入してください。&#10;例: 委任状の有効期限が切れそうなLNが3件あります。対応方法をご相談したいです。" style="width:100%;min-height:100px;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;line-height:1.6;resize:vertical"></textarea>
+        </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--muted)">
+          <span id="report-save-status">💡 記入後「保存」ボタンで保存してください</span>
+          <span id="report-last-saved" style="font-weight:600"></span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="report-clear-banner">
+      <h2>🎉 本日のミッション クリア！</h2>
+      <p class="report-date" id="report-date"></p>
+      <div class="report-total-score" id="report-total-score">0</div>
+      <div class="report-rank" id="report-rank">—</div>
+    </div>
+    <div id="report-body"></div>
+  </div>
+
+  <!-- ========== リーダーボード ========== -->
+  <div id="game-panel-leaderboard" class="game-panel">
+    <div class="card">
+      <div class="card-head" style="background: var(--purple-bg);">
+        <span class="card-title">🏆 リーダーボード — メンバー業務状況</span>
+        <span style="font-size: 12px; color: var(--muted);">今日の業務タスク・現在の進捗・完成したことを一覧</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px" id="leaderboard-summary"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="leaderboard-member-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="db_case.js"></script>
+<script src="db_game.js"></script>
+<script>
+  // ===== ゲームデータ合成 =====
+  USERS.forEach(u => {
+    const g = USER_GAME_DATA[u.id];
+    if (g) { u.level = g.level; u.totalPt = g.totalPt; u.title = g.title; }
+  });
+  const dailyReportData = actionLog;
+
+  let currentUser = USERS[0];
+  let currentRole = 'beginner';
+
+  // ===== URLパラメータ =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialPanel = urlParams.get('panel') || 'overview';
+  const initialUser = urlParams.get('user');
+
+  // ===== ユーザーセレクタ初期化 =====
+  function initUserSelect() {
+    const sel = document.getElementById('user-select');
+    if (!sel) return;
+    sel.innerHTML = USERS.map(u => {
+      const roleIcon = {beginner:'🛡️',expert:'⚔️',leader:'🏰'};
+      return '<option value="'+u.id+'">'+(roleIcon[u.role]||'🛡️')+' '+u.name+' ('+u.role+')</option>';
+    }).join('');
+  }
+
+  // ===== パネル切替 =====
+  function showGamePanel(id) {
+    document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('game-panel-' + id);
+    if (panel) panel.classList.add('active');
+    document.querySelectorAll('.game-tab').forEach(t => t.classList.toggle('active', t.dataset.panel === id));
+    if (id === 'report') updateReportPanel();
+    if (id === 'leaderboard') updateLeaderboardPanel();
+    if (id === 'overview') updateOverview();
+  }
+
+  // ===== レベル計算 =====
+  function getLevelInfo(totalPt) {
+    let lv = LEVEL_TABLE[0];
+    for (const l of LEVEL_TABLE) { if (totalPt >= l.minPt) lv = l; }
+    const nextLv = LEVEL_TABLE.find(l => l.minPt > totalPt);
+    return { ...lv, nextPt: nextLv ? nextLv.minPt : null, pct: nextLv ? Math.round((totalPt - lv.minPt) / (nextLv.minPt - lv.minPt) * 100) : 100 };
+  }
+
+  // ===== 昇格進捗 =====
+  function getPromotionProgress(userId) {
+    const pd = PROMOTION_DATA[userId];
+    if (!pd) return null;
+    const done = pd.conditions.filter(c => c.done).length;
+    return { ...pd, doneCount: done, totalCount: pd.conditions.length, pct: Math.round(done / pd.conditions.length * 100) };
+  }
+
+  // ===== レベルバー描画 =====
+  function renderLevelBar(user) {
+    const li = getLevelInfo(user.totalPt);
+    const roleIcon = {beginner:'🛡️',expert:'⚔️',leader:'🏰'}[user.role]||'🛡️';
+    let h = '<div style="display:flex;align-items:center;gap:10px;padding:8px 0">';
+    h += '<span style="font-size:20px">'+roleIcon+'</span>';
+    h += '<div style="flex:1">';
+    h += '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">';
+    h += '<span style="font-size:13px;font-weight:800">Lv.'+li.level+'</span>';
+    h += '<span style="font-size:11px;color:var(--muted)">'+li.title+'</span>';
+    h += '<span style="font-size:10px;color:var(--muted);margin-left:auto">'+user.totalPt+(li.nextPt?'/'+li.nextPt:'')+'pt</span>';
+    h += '</div>';
+    h += '<div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden">';
+    h += '<div style="height:100%;width:'+li.pct+'%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:3px;transition:width 0.3s"></div>';
+    h += '</div></div></div>';
+    return h;
+  }
+
+  // ===== 昇格カード描画 =====
+  function renderPromotionCard(userId) {
+    const pp = getPromotionProgress(userId);
+    if (!pp) return '<div style="color:var(--muted);font-size:12px;padding:16px">🏰 最高ロール到達済み</div>';
+    const roleIcon = {beginner:'🛡️',expert:'⚔️',leader:'🏰'};
+    let h = '<div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+    h += '<span style="font-size:16px">'+roleIcon[pp.from]+'→'+roleIcon[pp.to]+'</span>';
+    h += '<span style="font-size:13px;font-weight:700">'+pp.to.charAt(0).toUpperCase()+pp.to.slice(1)+' 昇格チェックリスト</span>';
+    h += '<span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:100px;background:'+(pp.pct>=80?'var(--green-bg)':'var(--amber-bg)')+';color:'+(pp.pct>=80?'var(--green)':'var(--amber)')+'">'+pp.pct+'%</span>';
+    h += '</div>';
+    pp.conditions.forEach(c => {
+      const pct = c.done ? 100 : Math.min(99, Math.round(c.current / c.target * 100));
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px">';
+      h += '<span style="font-size:14px">'+(c.done?'✅':'⬜')+'</span>';
+      h += '<span style="flex:1;color:'+(c.done?'var(--green)':'var(--text)')+'">'+c.label+'</span>';
+      h += '<span style="font-size:11px;color:var(--muted);min-width:60px;text-align:right">'+c.current+'/'+(c.unit||'')+c.target+'</span>';
+      h += '</div>';
+      if (!c.done) {
+        h += '<div style="margin:0 0 8px 22px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden">';
+        h += '<div style="height:100%;width:'+pct+'%;background:var(--blue);border-radius:2px;transition:width 0.3s"></div></div>';
+      }
+    });
+    h += '</div>';
+    return h;
+  }
+
+  // ===== マイページ更新 =====
+  function updateOverview() {
+    const lvBar = document.getElementById('overview-level-bar');
+    if (lvBar) lvBar.innerHTML = renderLevelBar(currentUser);
+    const promoCard = document.getElementById('overview-promotion-card');
+    if (promoCard) promoCard.innerHTML = renderPromotionCard(currentUser.id);
+
+    const rv = ROLE_VIEW[currentRole] || ROLE_VIEW.beginner;
+    const statsEl = document.getElementById('overview-stats');
+    if (statsEl && rv.stats) {
+      statsEl.innerHTML = rv.stats.map(s =>
+        '<div class="welcome-stat"><div class="welcome-stat-val" style="color:'+rv.welcomeColor+'">'+s.val+'</div><div class="welcome-stat-label">'+s.label+'</div></div>'
+      ).join('');
+    }
+    const pathEl = document.getElementById('overview-path-list');
+    if (pathEl && rv.expertPath) {
+      pathEl.innerHTML = rv.expertPath.map(p =>
+        '<span class="expert-path-item '+(p.done?'done':'')+'"><span>'+(p.done?'✓':'○')+'</span>'+p.text+'</span>'
+      ).join('');
+    }
+  }
+
+  // ===== 日次レポート =====
+  function updateReportPanel() {
+    const calc = (arr) => {
+      let pt = 0;
+      const items = (arr || []).map(a => {
+        const p = POINTS[a.task] || 10;
+        pt += p;
+        let label = '';
+        if (a.task === 'report') label = '完了報告';
+        else if (a.task === 'ln-check') label = 'LN確認 ' + (a.extra?.ln || '—');
+        else label = '本日対応完了';
+        return { at: a.at, label, pt: p };
+      });
+      return { items, total: pt };
+    };
+    const fmt = (data) => {
+      if (!data.items.length) return '<div class="report-empty">— 未記録 —</div>';
+      return data.items.map(d =>
+        '<div class="report-task-item"><span class="task-ok">✓</span><span>'+d.at+' '+d.label+'</span><span class="task-point">+'+d.pt+' pt</span></div>'
+      ).join('');
+    };
+    const roleIcon = { beginner: '🆕', expert: '⭐', leader: '👔' };
+    const roleLabel = { beginner: 'beginner', expert: 'expert', leader: 'leader' };
+
+    const body = document.getElementById('report-body');
+    let total = 0;
+    let html = '';
+
+    if (currentRole === 'leader') {
+      USERS.forEach(u => {
+        const data = calc(dailyReportData[u.id] || []);
+        total += data.total;
+        html += '<div class="report-role-card '+u.role+'"><div class="report-role-header"><span class="report-role-title">'+roleIcon[u.role]+' '+u.name+' <small style="opacity:0.7">('+roleLabel[u.role]+')</small></span><span class="report-role-points">'+data.total+' pt</span></div><div>'+fmt(data)+'</div></div>';
+      });
+    } else {
+      const data = calc(dailyReportData[currentUser.id] || []);
+      total = data.total;
+      html = '<div class="report-role-card '+currentRole+'"><div class="report-role-header"><span class="report-role-title">'+roleIcon[currentRole]+' '+currentUser.name+' <small style="opacity:0.7">('+roleLabel[currentRole]+')</small></span><span class="report-role-points">'+data.total+' pt</span></div><div>'+fmt(data)+'</div></div>';
+    }
+
+    const rank = [...RANKS].reverse().find(r => total >= r.min)?.label || RANKS[0].label;
+    body.innerHTML = html;
+    document.getElementById('report-total-score').textContent = total + ' pt';
+    document.getElementById('report-rank').textContent = rank;
+    document.getElementById('report-date').textContent = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+    
+    // 保存された報告内容を読み込み
+    loadReport();
+  }
+  
+  // ===== 報告の保存 =====
+  function saveReport() {
+    const workContent = document.getElementById('report-work-content').value;
+    const message = document.getElementById('report-message').value;
+    
+    if (!workContent.trim() && !message.trim()) {
+      alert('報告内容または伝達事項を入力してください');
+      return;
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const reportKey = `daily_report_${currentUser.id}_${today}`;
+    
+    const reportData = {
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userRole: currentUser.role,
+      date: today,
+      workContent: workContent,
+      message: message,
+      savedAt: new Date().toISOString()
+    };
+    
+    try {
+      localStorage.setItem(reportKey, JSON.stringify(reportData));
+      
+      // 保存成功メッセージ
+      const statusEl = document.getElementById('report-save-status');
+      const lastSavedEl = document.getElementById('report-last-saved');
+      
+      statusEl.textContent = '✅ 保存しました！';
+      statusEl.style.color = 'var(--green)';
+      statusEl.style.fontWeight = '600';
+      
+      const now = new Date();
+      lastSavedEl.textContent = `最終保存: ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      // 2秒後に元に戻す
+      setTimeout(() => {
+        statusEl.textContent = '💡 記入後「保存」ボタンで保存してください';
+        statusEl.style.color = 'var(--muted)';
+        statusEl.style.fontWeight = 'normal';
+      }, 2000);
+      
+      console.log('✓ 日次報告を保存しました:', reportKey);
+    } catch (e) {
+      console.error('報告の保存に失敗:', e);
+      alert('保存に失敗しました: ' + e.message);
+    }
+  }
+  
+  // ===== 報告の読み込み =====
+  function loadReport() {
+    const today = new Date().toISOString().split('T')[0];
+    const reportKey = `daily_report_${currentUser.id}_${today}`;
+    
+    try {
+      const saved = localStorage.getItem(reportKey);
+      if (saved) {
+        const reportData = JSON.parse(saved);
+        
+        document.getElementById('report-work-content').value = reportData.workContent || '';
+        document.getElementById('report-message').value = reportData.message || '';
+        
+        const lastSavedEl = document.getElementById('report-last-saved');
+        const savedDate = new Date(reportData.savedAt);
+        lastSavedEl.textContent = `最終保存: ${savedDate.getHours()}:${String(savedDate.getMinutes()).padStart(2, '0')}`;
+        
+        console.log('✓ 日次報告を読み込みました:', reportKey);
+      }
+    } catch (e) {
+      console.error('報告の読み込みに失敗:', e);
+    }
+  }
+
+  // ===== リーダーボード =====
+  function updateLeaderboardPanel() {
+    const calc = (arr) => {
+      let pt = 0;
+      const tasks = {};
+      (arr || []).forEach(d => {
+        pt += (POINTS[d.task] || 0);
+        tasks[d.task] = (tasks[d.task] || 0) + 1;
+      });
+      return { pt, tasks };
+    };
+    const summaryEl = document.getElementById('leaderboard-summary');
+    const gridEl = document.getElementById('leaderboard-member-grid');
+    if (!summaryEl || !gridEl) return;
+
+    let totalPt = 0, activeCount = 0, totalFiled = 0, totalTarget = 0;
+    USERS.forEach(u => {
+      const r = calc(dailyReportData[u.id]);
+      totalPt += r.pt;
+      if (r.pt > 0) activeCount++;
+      const mr = MONTHLY_RESULTS[u.id] || {};
+      totalFiled += (mr.filed || 0);
+      totalTarget += (mr.target || 0);
+    });
+
+    const monthName = new Date().toLocaleDateString('ja-JP', { month: 'long' });
+    summaryEl.innerHTML = '<div class="leaderboard-stat-card"><div class="leaderboard-stat-val" style="color:var(--purple)">'+totalFiled+'<span style="font-size:14px;font-weight:500;color:var(--muted)"> / '+totalTarget+'</span></div><div class="leaderboard-stat-label">'+monthName+'申立 実績/目標</div></div>'
+      + '<div class="leaderboard-stat-card"><div class="leaderboard-stat-val" style="color:var(--green)">'+totalPt+'</div><div class="leaderboard-stat-label">チーム合計 pt</div></div>'
+      + '<div class="leaderboard-stat-card"><div class="leaderboard-stat-val" style="color:var(--blue)">'+activeCount+' / '+USERS.length+'</div><div class="leaderboard-stat-label">稼働中 / 人数</div></div>';
+
+    const roleIcon = {beginner:'🛡️',expert:'⚔️',leader:'🏰'};
+    const roleColor = {beginner:'var(--green)',expert:'var(--blue)',leader:'var(--purple)'};
+    const ms = LEADERBOARD_MEMBER_STATUS;
+    const sorted = [...USERS].sort((a, b) => b.level - a.level || b.totalPt - a.totalPt);
+
+    gridEl.innerHTML = sorted.map(u => {
+      const r = calc(dailyReportData[u.id]);
+      const m = ms[u.id] || {};
+      const li = getLevelInfo(u.totalPt);
+      const pp = getPromotionProgress(u.id);
+      const promoHtml = pp ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:10px;color:var(--muted)">'+roleIcon[pp.from]+'→'+roleIcon[pp.to]+' 昇格</span><span style="font-size:10px;font-weight:700;color:'+(pp.pct>=80?'var(--green)':'var(--amber)')+'">'+pp.pct+'%</span></div><div style="height:3px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pp.pct+'%;background:'+(pp.pct>=80?'var(--green)':'var(--amber)')+';border-radius:2px"></div></div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+pp.conditions.map(c=>'<span style="font-size:9px;padding:1px 6px;border-radius:8px;background:'+(c.done?'var(--green-bg)':'var(--surface2)')+';color:'+(c.done?'var(--green)':'var(--muted)')+'">'+(c.done?'✅':'⬜')+c.label.split(' ')[0]+'</span>').join('')+'</div></div>' : (u.role==='leader'?'<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--purple)">🏰 最高ロール到達</div>':'');
+
+      const mr = MONTHLY_RESULTS[u.id] || {filed:0,target:1};
+      const mrPct = Math.round((mr.filed / mr.target) * 100);
+
+      return '<div class="leaderboard-member-card">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+        + '<span style="font-size:16px">'+(roleIcon[u.role]||'🛡️')+'</span>'
+        + '<div style="flex:1"><div style="font-weight:700;font-size:13px">'+u.name+'</div><div style="font-size:10px;color:var(--muted)">Lv.'+li.level+' '+li.title+' ・ '+u.role+'</div></div>'
+        + '<div style="text-align:right"><div style="font-size:16px;font-weight:800;color:'+(roleColor[u.role]||'var(--green)')+'">'+r.pt+'<span style="font-size:10px;font-weight:500">pt</span></div></div>'
+        + '</div>'
+        + '<div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+li.pct+'%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:2px"></div></div>'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:4px 8px;background:'+(mrPct>=100?'#f0fdf4':'#fffbeb')+';border-radius:6px;border:1px solid '+(mrPct>=100?'#bbf7d0':'#fde68a')+'">'
+        + '<span style="font-size:10px;font-weight:600;color:'+(mrPct>=100?'#15803d':'#b45309')+'">今月申立</span>'
+        + '<span style="font-size:12px;font-weight:800;color:'+(mrPct>=100?'#15803d':'#b45309')+'">'+mr.filed+' / '+mr.target+'</span>'
+        + '<span style="font-size:9px;color:'+(mrPct>=100?'#15803d':'#b45309')+'">'+mrPct+'%</span></div>'
+        + '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">今日: '+(m.todayTasks||'—')+'</div>'
+        + '<div style="font-size:10px;color:var(--muted)">状況: '+(m.situation||'—')+'</div>'
+        + promoHtml
+        + '</div>';
+    }).join('');
+  }
+
+  // ===== ユーザー切替 =====
+  function setUser(userId) {
+    const u = USERS.find(x => x.id === userId) || USERS[0];
+    currentUser = u;
+    currentRole = u.role;
+    const sel = document.getElementById('user-select');
+    if (sel) sel.value = u.id;
+    // 現在のパネルを再描画
+    const activePanel = document.querySelector('.game-panel.active');
+    if (activePanel) {
+      const id = activePanel.id.replace('game-panel-', '');
+      showGamePanel(id);
+    }
+  }
+
+  // ===== 初期化 =====
+  document.addEventListener('DOMContentLoaded', function() {
+    initUserSelect();
+    if (initialUser) {
+      setUser(initialUser);
+    } else {
+      setUser(USERS[0].id);
+    }
+    showGamePanel(initialPanel);
+  });
+</script>
+
+<!-- ========== フィードバック機能 ========== -->
+<style>
+.feedback-float-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;box-shadow:0 4px 12px rgba(59,130,246,0.4);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;z-index:9998;transition:all .3s}
+.feedback-float-btn:hover{transform:scale(1.1)}
+.feedback-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center}
+.feedback-modal-overlay.active{display:flex}
+.feedback-modal-box{background:#fff;border-radius:16px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.feedback-modal-header{display:flex;justify-content:space-between;align-items:center;padding:24px 24px 16px;border-bottom:1px solid #e5e7eb}
+.feedback-modal-title{font-size:18px;font-weight:700}
+.feedback-modal-close{width:32px;height:32px;border-radius:8px;border:none;background:#f3f4f6;cursor:pointer;font-size:20px}
+.feedback-modal-body{padding:24px}
+.feedback-form-group{margin-bottom:20px}
+.feedback-form-label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.feedback-form-select,.feedback-form-input,.feedback-form-textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px}
+.feedback-form-textarea{min-height:120px;resize:vertical}
+.feedback-form-submit{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.feedback-status{margin-top:16px;padding:12px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;display:none}
+.feedback-status.success{background:#d1fae5;color:#065f46}
+</style>
+
+<button class="feedback-float-btn" onclick="document.getElementById('feedbackModalOverlay').classList.add('active');document.getElementById('feedbackLocation').value=document.title.split('—')[0].trim()" title="フィードバックを送信: G-99"><span style="font-size:24px">💬</span><span class="element-id" style="position:absolute;bottom:2px;right:2px;font-size:7px;padding:1px 3px;background:#fff;color:#3b82f6" title="要素ID: G-99">G-99</span></button>
+
+<div id="feedbackModalOverlay" class="feedback-modal-overlay" onclick="if(event.target.id==='feedbackModalOverlay')this.classList.remove('active')">
+  <div class="feedback-modal-box">
+    <div class="feedback-modal-header">
+      <div class="feedback-modal-title">💬 フィードバックを送信</div>
+      <button class="feedback-modal-close" onclick="document.getElementById('feedbackModalOverlay').classList.remove('active')">×</button>
+    </div>
+    <div class="feedback-modal-body">
+      <form onsubmit="event.preventDefault();var t=document.getElementById('feedbackType').value,l=document.getElementById('feedbackLocation').value,c=document.getElementById('feedbackContent').value.trim(),n=document.getElementById('feedbackName').value.trim();if(!c)return;var f={id:'fb_'+Date.now(),type:t,location:l||document.title,content:c,name:n||'匿名',timestamp:new Date().toISOString()};var fs=JSON.parse(localStorage.getItem('system_feedbacks')||'[]');fs.push(f);localStorage.setItem('system_feedbacks',JSON.stringify(fs));document.getElementById('feedbackStatus').className='feedback-status success';document.getElementById('feedbackStatus').textContent='✓ 送信しました！';document.getElementById('feedbackStatus').style.display='block';setTimeout(function(){document.getElementById('feedbackModalOverlay').classList.remove('active')},2000)">
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">種類</label>
+          <select id="feedbackType" class="feedback-form-select" required>
+            <option value="">選択</option>
+            <option value="bug">🐛 バグ</option>
+            <option value="improvement">💡 改善提案</option>
+            <option value="question">❓ 質問</option>
+            <option value="other">📝 その他</option>
+          </select>
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">ページ・機能名</label>
+          <input type="text" id="feedbackLocation" class="feedback-form-input">
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">詳細 *</label>
+          <textarea id="feedbackContent" class="feedback-form-textarea" required></textarea>
+        </div>
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">お名前（任意）</label>
+          <input type="text" id="feedbackName" class="feedback-form-input">
+        </div>
+        <button type="submit" class="feedback-form-submit">📤 送信</button>
+        <div id="feedbackStatus" class="feedback-status"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

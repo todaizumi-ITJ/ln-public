@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フィードバック管理 — システム改善</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #f9fafb;
+      color: #111827;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      padding: 32px 40px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .stat-card.bug .stat-value { color: #dc2626; }
+    .stat-card.improvement .stat-value { color: #2563eb; }
+    .stat-card.question .stat-value { color: #d97706; }
+    
+    .filters {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      background: #e5e7eb;
+    }
+    .filter-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .action-btn.export {
+      background: #059669;
+      color: white;
+    }
+    .action-btn.clear {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .feedback-item {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-left: 4px solid #3b82f6;
+    }
+    .feedback-item.bug { border-left-color: #dc2626; }
+    .feedback-item.improvement { border-left-color: #2563eb; }
+    .feedback-item.question { border-left-color: #d97706; }
+    .feedback-item.other { border-left-color: #6b7280; }
+    
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .feedback-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .feedback-type-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .feedback-type-badge.bug { background: #fee2e2; color: #991b1b; }
+    .feedback-type-badge.improvement { background: #dbeafe; color: #1e40af; }
+    .feedback-type-badge.question { background: #fef3c7; color: #92400e; }
+    .feedback-type-badge.other { background: #f3f4f6; color: #374151; }
+    
+    .feedback-location {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .feedback-time {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .feedback-author {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    
+    .feedback-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #374151;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+    
+    .feedback-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .feedback-action-btn {
+      padding: 6px 12px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .feedback-action-btn:hover {
+      background: #f3f4f6;
+    }
+    .feedback-action-btn.delete {
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+    .feedback-action-btn.delete:hover {
+      background: #fee2e2;
+    }
+    
+    .empty-state {
+      background: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      text-align: center;
+      color: #9ca3af;
+    }
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    /* 要素番号バッジ */
+    .element-id {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      color: #9ca3af;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 2px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      cursor: help;
+      transition: all 0.2s;
+    }
+    .element-id:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💬 フィードバック管理</h1>
+      <p>ユーザーからの修正依頼・改善提案・質問を確認して、システムをより良くしましょう</p>
+    </div>
+    
+    <div class="stats" id="stats">
+      <div class="stat-card">
+        <div class="stat-label">全フィードバック</div>
+        <div class="stat-value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card bug">
+        <div class="stat-label">🐛 バグ・不具合</div>
+        <div class="stat-value" id="stat-bug">0</div>
+      </div>
+      <div class="stat-card improvement">
+        <div class="stat-label">💡 改善提案</div>
+        <div class="stat-value" id="stat-improvement">0</div>
+      </div>
+      <div class="stat-card question">
+        <div class="stat-label">❓ 質問</div>
+        <div class="stat-value" id="stat-question">0</div>
+      </div>
+    </div>
+    
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">すべて<span class="element-id" title="要素ID: FB-01">FB-01</span></button>
+      <button class="filter-btn" data-filter="bug" onclick="setFilter('bug')">🐛 バグ<span class="element-id" title="要素ID: FB-02">FB-02</span></button>
+      <button class="filter-btn" data-filter="improvement" onclick="setFilter('improvement')">💡 改善提案<span class="element-id" title="要素ID: FB-03">FB-03</span></button>
+      <button class="filter-btn" data-filter="question" onclick="setFilter('question')">❓ 質問<span class="element-id" title="要素ID: FB-04">FB-04</span></button>
+      <button class="filter-btn" data-filter="other" onclick="setFilter('other')">📝 その他<span class="element-id" title="要素ID: FB-05">FB-05</span></button>
+      
+      <div class="actions">
+        <button class="action-btn export" onclick="exportAllFeedbacks()">📥 エクスポート<span class="element-id" title="要素ID: FB-10">FB-10</span></button>
+        <button class="action-btn clear" onclick="clearAllFeedbacks()">🗑️ すべて削除<span class="element-id" title="要素ID: FB-11">FB-11</span></button>
+      </div>
+    </div>
+    
+    <div class="feedback-list" id="feedbackList"></div>
+  </div>
+  
+  <script>
+    let currentFilter = 'all';
+    let allFeedbacks = [];
+    
+    // フィードバックを読み込み
+    function loadFeedbacks() {
+      const systemFeedbacks = JSON.parse(localStorage.getItem('system_feedbacks') || '[]');
+      const manualFeedbacks = JSON.parse(localStorage.getItem('manual_feedbacks') || '[]')
+        .map(f => ({...f, location: f.section ? `マニュアル ${f.section}` : 'マニュアル'}));
+      
+      allFeedbacks = [...systemFeedbacks, ...manualFeedbacks]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      updateStats();
+      renderFeedbacks();
+    }
+    
+    // 統計を更新
+    function updateStats() {
+      document.getElementById('stat-total').textContent = allFeedbacks.length;
+      document.getElementById('stat-bug').textContent = allFeedbacks.filter(f => f.type === 'bug').length;
+      document.getElementById('stat-improvement').textContent = allFeedbacks.filter(f => f.type === 'improvement').length;
+      document.getElementById('stat-question').textContent = allFeedbacks.filter(f => f.type === 'question').length;
+    }
+    
+    // フィルタを設定
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderFeedbacks();
+    }
+    
+    // フィードバックを表示
+    function renderFeedbacks() {
+      const container = document.getElementById('feedbackList');
+      let filtered = allFeedbacks;
+      
+      if (currentFilter !== 'all') {
+        filtered = allFeedbacks.filter(f => f.type === currentFilter);
+      }
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:8px">フィードバックがありません</div>
+            <div style="font-size:14px">ユーザーからのフィードバックがここに表示されます</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = filtered.map((f, index) => {
+        const date = new Date(f.timestamp);
+        const dateStr = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2,'0')}`;
+        const typeLabel = {
+          'bug': '🐛 バグ',
+          'improvement': '💡 改善提案',
+          'question': '❓ 質問',
+          'other': '📝 その他'
+        }[f.type] || '📝 その他';
+        
+        return `
+          <div class="feedback-item ${f.type}">
+            <div class="feedback-header">
+              <div class="feedback-meta">
+                <span class="feedback-type-badge ${f.type}">${typeLabel}</span>
+                <span class="feedback-location">📍 ${f.location || 'ページ不明'}</span>
+                <span class="feedback-time">⏰ ${dateStr}</span>
+                <span class="feedback-author">👤 ${f.name || '匿名'}</span>
+              </div>
+            </div>
+            <div class="feedback-content">${escapeHtml(f.content || f.text || '')}</div>
+            <div class="feedback-actions">
+              <button class="feedback-action-btn delete" onclick="deleteFeedback('${f.id}')">🗑️ 削除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // HTMLエスケープ
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // フィードバックを削除
+    function deleteFeedback(id) {
+      if (!confirm('このフィードバックを削除しますか？')) return;
+      
+      // system_feedbacksから削除
+      let systemFeedbacks = JSON.parse(localStorage.getItem('system_feedbacks') || '[]');
+      systemFeedbacks = systemFeedbacks.filter(f => f.id !== id);
+      localStorage.setItem('system_feedbacks', JSON.stringify(systemFeedbacks));
+      
+      // manual_feedbacksから削除
+      let manualFeedbacks = JSON.parse(localStorage.getItem('manual_feedbacks') || '[]');
+      manualFeedbacks = manualFeedbacks.filter(f => f.id !== id);
+      localStorage.setItem('manual_feedbacks', JSON.stringify(manualFeedbacks));
+      
+      loadFeedbacks();
+    }
+    
+    // すべて削除
+    function clearAllFeedbacks() {
+      if (!confirm('すべてのフィードバックを削除しますか？この操作は取り消せません。')) return;
+      
+      localStorage.removeItem('system_feedbacks');
+      localStorage.removeItem('manual_feedbacks');
+      
+      loadFeedbacks();
+    }
+    
+    // エクスポート
+    function exportAllFeedbacks() {
+      if (allFeedbacks.length === 0) {
+        alert('エクスポートするフィードバックがありません');
+        return;
+      }
+      
+      const data = {
+        exportDate: new Date().toISOString(),
+        totalCount: allFeedbacks.length,
+        feedbacks: allFeedbacks
+      };
+      
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `feedbacks_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    // 初期化
+    loadFeedbacks();
+  </script>
+</body>
+</html>

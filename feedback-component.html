@@ -1,0 +1,360 @@
+<!-- 
+  共通フィードバックコンポーネント
+  使い方: 各HTMLファイルの</body>直前にこのファイルをインクルード
+  または、内容をコピーして貼り付け
+-->
+
+<style>
+/* フィードバックボタン（固定） */
+.feedback-float-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  transition: all 0.3s ease;
+}
+.feedback-float-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+.feedback-float-btn:active {
+  transform: scale(0.95);
+}
+
+/* フィードバックモーダル */
+.feedback-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.feedback-modal-overlay.active {
+  display: flex;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.feedback-modal-box {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.feedback-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.feedback-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feedback-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.feedback-modal-close:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+.feedback-modal-body {
+  padding: 24px;
+}
+.feedback-form-group {
+  margin-bottom: 20px;
+}
+.feedback-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+}
+.feedback-form-select,
+.feedback-form-input,
+.feedback-form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.feedback-form-select:focus,
+.feedback-form-input:focus,
+.feedback-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.feedback-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.feedback-form-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.feedback-form-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.feedback-form-submit:active {
+  transform: translateY(0);
+}
+.feedback-status {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+.feedback-status.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.feedback-status.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.feedback-type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.feedback-type-badge.bug { background: #fee2e2; color: #991b1b; }
+.feedback-type-badge.improvement { background: #dbeafe; color: #1e40af; }
+.feedback-type-badge.question { background: #fef3c7; color: #92400e; }
+.feedback-type-badge.other { background: #f3f4f6; color: #374151; }
+</style>
+
+<!-- フィードバックボタン（固定） -->
+<button class="feedback-float-btn" onclick="openFeedbackModal()" title="フィードバックを送信">
+  💬
+</button>
+
+<!-- フィードバックモーダル -->
+<div id="feedbackModalOverlay" class="feedback-modal-overlay" onclick="closeFeedbackModalOnOverlay(event)">
+  <div class="feedback-modal-box">
+    <div class="feedback-modal-header">
+      <div class="feedback-modal-title">
+        💬 フィードバックを送信
+      </div>
+      <button class="feedback-modal-close" onclick="closeFeedbackModal()">×</button>
+    </div>
+    <div class="feedback-modal-body">
+      <form id="feedbackForm" onsubmit="submitFeedback(event)">
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">フィードバックの種類</label>
+          <select id="feedbackType" class="feedback-form-select" required>
+            <option value="">選択してください</option>
+            <option value="bug">🐛 バグ・不具合</option>
+            <option value="improvement">💡 改善提案</option>
+            <option value="question">❓ 質問・わからないこと</option>
+            <option value="other">📝 その他</option>
+          </select>
+        </div>
+        
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">ページ・機能名（任意）</label>
+          <input type="text" id="feedbackLocation" class="feedback-form-input" 
+            placeholder="例: LN一覧、申立書作成、書類チェックリスト">
+        </div>
+        
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">詳細な内容 <span style="color:#ef4444">*</span></label>
+          <textarea id="feedbackContent" class="feedback-form-textarea" required
+            placeholder="例: 
+• 書類チェックリストで委任状にチェックを入れても保存されない
+• 申立書プレビューの文字が小さくて読みにくい
+• 証拠説明書の自動生成機能がほしい
+• この画面の使い方がわからない"></textarea>
+        </div>
+        
+        <div class="feedback-form-group">
+          <label class="feedback-form-label">あなたのお名前（任意）</label>
+          <input type="text" id="feedbackName" class="feedback-form-input" 
+            placeholder="例: 織田信長">
+        </div>
+        
+        <button type="submit" class="feedback-form-submit">
+          📤 送信する
+        </button>
+        
+        <div id="feedbackStatus" class="feedback-status" style="display:none"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// フィードバック機能のJavaScript
+(function() {
+  // ページ情報を自動取得
+  function getPageInfo() {
+    return {
+      url: window.location.href,
+      pathname: window.location.pathname,
+      pageTitle: document.title,
+      userAgent: navigator.userAgent,
+      screenSize: `${window.screen.width}x${window.screen.height}`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // モーダルを開く
+  window.openFeedbackModal = function() {
+    const modal = document.getElementById('feedbackModalOverlay');
+    if (modal) {
+      modal.classList.add('active');
+      // フォームをリセット
+      document.getElementById('feedbackForm').reset();
+      document.getElementById('feedbackStatus').style.display = 'none';
+      
+      // 現在のページ名を自動入力
+      const pageName = document.title.split('—')[0].trim();
+      document.getElementById('feedbackLocation').value = pageName;
+      
+      // ユーザー名を復元
+      const savedName = localStorage.getItem('feedback_user_name');
+      if (savedName) {
+        document.getElementById('feedbackName').value = savedName;
+      }
+    }
+  };
+
+  // モーダルを閉じる
+  window.closeFeedbackModal = function() {
+    const modal = document.getElementById('feedbackModalOverlay');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  };
+
+  // オーバーレイクリックで閉じる
+  window.closeFeedbackModalOnOverlay = function(event) {
+    if (event.target.id === 'feedbackModalOverlay') {
+      closeFeedbackModal();
+    }
+  };
+
+  // フィードバックを送信
+  window.submitFeedback = function(event) {
+    event.preventDefault();
+    
+    const type = document.getElementById('feedbackType').value;
+    const location = document.getElementById('feedbackLocation').value;
+    const content = document.getElementById('feedbackContent').value.trim();
+    const name = document.getElementById('feedbackName').value.trim();
+    
+    if (!content) {
+      showFeedbackStatus('詳細な内容を入力してください', 'error');
+      return;
+    }
+    
+    // フィードバックデータを作成
+    const feedback = {
+      id: 'fb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      type: type,
+      location: location || document.title,
+      content: content,
+      name: name || '匿名',
+      pageInfo: getPageInfo(),
+      timestamp: new Date().toISOString(),
+      status: 'new' // new, reviewing, resolved
+    };
+    
+    // localStorageに保存
+    const feedbacks = JSON.parse(localStorage.getItem('system_feedbacks') || '[]');
+    feedbacks.push(feedback);
+    localStorage.setItem('system_feedbacks', JSON.stringify(feedbacks));
+    
+    // ユーザー名を保存
+    if (name) {
+      localStorage.setItem('feedback_user_name', name);
+    }
+    
+    // 成功メッセージ
+    showFeedbackStatus('✓ フィードバックを送信しました！ご協力ありがとうございます。', 'success');
+    
+    // フォームをリセット
+    setTimeout(() => {
+      closeFeedbackModal();
+    }, 2000);
+    
+    console.log('フィードバック送信:', feedback);
+  };
+
+  // ステータス表示
+  function showFeedbackStatus(message, type) {
+    const status = document.getElementById('feedbackStatus');
+    if (status) {
+      status.textContent = message;
+      status.className = 'feedback-status ' + type;
+      status.style.display = 'block';
+    }
+  }
+
+  // ESCキーでモーダルを閉じる
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeFeedbackModal();
+    }
+  });
+})();
+</script>

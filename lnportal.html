@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<!-- LNポータルモック - このHTML単体で動作します（外部ファイル・ネットワーク不要） -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LNポータル — 開示請求・裁判用</title>
+  <style>
+    :root {
+      /* フォント設定 */
+      --font: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      /* メインテキスト色 */
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --faint: #9ca3af;
+      /* 背景・境界線 */
+      --surface: #ffffff;
+      --surface2: #f9fafb;
+      --border: #e5e7eb;
+      /* アクセントカラー */
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --yellow: #d97706;
+      --yellow-bg: #fffbeb;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --purple: #7e3af2;
+      --purple-bg: #f5f3ff;
+      /* レイアウト用 */
+      --bg: #f9fafb;
+      --sidebar-bg: #ffffff;
+      --accent: #2563eb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background-color: var(--surface2); color: var(--ink); margin: 0; min-height: 100vh; }
+
+    /* Layout: Sidebar + Main */
+    .app-layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px; flex-shrink: 0; background: var(--sidebar-bg);
+      border-right: 1px solid var(--border); padding: 24px 16px;
+    }
+    .sidebar-logo { font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 32px; letter-spacing: -0.5px; }
+    .sidebar-section { margin-bottom: 28px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; color: var(--faint); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+    .sidebar-nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin-bottom: 4px;
+      border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .sidebar-nav-item:hover { background: var(--surface2); color: var(--ink); }
+    .sidebar-nav-item.active { background: var(--blue-bg); color: var(--accent); }
+    .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .header {
+      background: var(--surface); color: var(--ink); padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .header-title { font-size: 18px; font-weight: 700; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; background: var(--surface2); color: var(--ink);
+      border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: background 0.2s; border: 1px solid var(--border);
+    }
+    .back-btn:hover { background: var(--border); }
+
+    .container { flex: 1; max-width: 1100px; margin: 0 auto; padding: 28px 24px; width: 100%; }
+
+    /* タスク選択（ユーザー目線の入口） */
+    .task-intro {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .task-intro h2 { font-size: 15px; color: var(--muted); margin-bottom: 16px; font-weight: 600; }
+    .task-intro h2::before { content: "💡 "; }
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .task-card {
+      padding: 20px 22px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .task-card:hover {
+      border-color: var(--blue);
+      background: var(--blue-bg);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(59,130,246,0.2);
+    }
+    .task-card .icon { font-size: 28px; margin-bottom: 10px; }
+    .task-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .task-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* LN一覧 */
+    .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; }
+    .card-body { padding: 16px 20px; }
+
+    /* 準備状況バッジ（ピル型） */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-ready { background: var(--green-bg); color: var(--green); }
+    .status-processing { background: var(--blue-bg); color: var(--blue); }
+    .status-pending { background: var(--yellow-bg); color: var(--yellow); }
+    .status-action { background: var(--red-bg); color: var(--red); }
+
+    /* LN行 */
+    .ln-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 90px 120px 100px;
+      gap: 12px;
+      padding: 14px 20px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .ln-row:last-child { border-bottom: none; }
+    .ln-row:hover { background: var(--surface2); }
+    @media (max-width: 700px) {
+      .ln-row { grid-template-columns: 1fr auto; gap: 8px; }
+      .ln-row .hide-mobile { display: none; }
+    }
+    .ln-num { font-family: monospace; font-weight: 700; font-size: 14px; color: var(--accent); }
+    .ln-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+
+    /* ====== LN一覧 カードスタイル ====== */
+    .ln-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .ln-card:hover {
+      border-color: #c7d2e0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .ln-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      cursor: pointer;
+      gap: 12px;
+    }
+    .ln-card-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+    .ln-card-num {
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent);
+      background: #f0f4ff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      letter-spacing: -0.02em;
+    }
+    .ln-card-parties {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ln-card-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .ln-card-ip {
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #eff6ff;
+      padding: 3px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .ln-card-date {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .ln-card-arrow {
+      font-size: 10px;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+    /* Progress strip */
+    .ln-card-bars {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 18px 12px;
+    }
+    .ln-bar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ln-bar-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      min-width: 28px;
+      flex-shrink: 0;
+    }
+    .ln-bar-pct {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: monospace;
+      min-width: 48px;
+      text-align: center;
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .ln-card-docs {
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      flex-shrink: 0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #f9fafb;
+    }
+    /* Expand detail */
+    .ln-expand-detail {
+      background: #f8f9fb;
+      border-top: 1px solid var(--border);
+      padding: 16px 20px;
+      animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 400px; } }
+    .ln-expand-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 28px;
+    }
+    .ln-expand-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .ln-expand-label {
+      color: var(--muted);
+      min-width: 100px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+    .ln-expand-val {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .ev-missing { font-family: monospace; font-size: 11px; }
+    .ln-expand-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ln-open-makeln {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.25);
+    }
+    .ln-open-makeln:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+      transform: translateY(-1px);
+    }
+    .ln-drive-link {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.25);
+      white-space: nowrap;
+    }
+    .ln-drive-link:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      box-shadow: 0 4px 12px rgba(16,185,129,0.35);
+      transform: translateY(-1px);
+    }
+    .ln-db-files-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 2px dashed #d1d5db;
+      background: #f9fafb;
+      color: #9ca3af;
+      cursor: not-allowed;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .ln-db-files-btn:not(:disabled) {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(124,58,237,0.25);
+    }
+    .ln-db-files-btn:not(:disabled):hover {
+      background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+      box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+      transform: translateY(-1px);
+    }
+    @media (max-width: 700px) {
+      .ln-card-head { flex-wrap: wrap; }
+      .ln-card-bars { flex-wrap: wrap; gap: 8px; }
+      .ln-expand-grid { grid-template-columns: 1fr; }
+    }
+
+    /* チェックリスト（申立準備） */
+    .checklist {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .checklist-head {
+      padding: 14px 18px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 700;
+    }
+    .checklist-item {
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .checklist-item:last-child { border-bottom: none; }
+    .check-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .check-icon.ok { background: var(--green-bg); color: var(--green); }
+    .check-icon.ng { background: var(--red-bg); color: var(--red); }
+    .check-icon.wip { background: var(--blue-bg); color: var(--blue); }
+    .checklist-group { margin-bottom: 20px; }
+    .checklist-group-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+    .checklist-group-title.create { color: var(--blue); border-bottom-color: var(--blue); }
+    .checklist-group-title.collect { color: var(--green); border-bottom-color: var(--green); }
+    .auto-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-left: 6px; }
+    .auto-badge.auto { background: var(--green-bg); color: var(--green); }
+    .auto-badge.partial { background: var(--yellow-bg); color: var(--yellow); }
+    .auto-badge.manual { background: var(--surface2); color: var(--muted); }
+    .sidebar-feedback { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .sidebar-feedback-title { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .sidebar-feedback-content { font-size: 11px; color: var(--ink); line-height: 1.6; padding: 10px 12px; background: var(--surface2); border-radius: 8px; min-height: 60px; max-height: 120px; overflow-y: auto; }
+    .sidebar-feedback-content.empty { color: var(--faint); font-style: italic; }
+    .sidebar-feedback-link { display: block; margin-top: 8px; font-size: 11px; color: var(--blue); font-weight: 600; text-decoration: none; }
+    .sidebar-feedback-link:hover { text-decoration: underline; }
+
+    /* アクションボタン群 */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+    .btn-secondary { background: var(--surface2); color: var(--ink); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+
+    /* テーブル */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+      background: var(--surface2);
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: var(--surface2); }
+    .mono { font-family: monospace; font-size: 11px; }
+
+    .tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .tag-green { background: var(--green-bg); color: var(--green); }
+    .tag-blue { background: var(--blue-bg); color: var(--blue); }
+    .tag-yellow { background: var(--yellow-bg); color: var(--yellow); }
+    .tag-red { background: var(--red-bg); color: var(--red); }
+
+    /* 隠しパネル */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* タブ */
+    .tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .tab:hover { background: var(--border); color: var(--ink); }
+    .tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+    .tab .count { font-size: 11px; opacity: 0.9; margin-left: 4px; }
+
+    /* サマリーカード（クリック可能） */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .summary-card { padding: 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+    .summary-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .summary-card.all { background: var(--surface2); }
+    .summary-card.all:hover { border-color: var(--muted); }
+    .summary-card.ready { background: var(--green-bg); }
+    .summary-card.ready:hover { border-color: var(--green); }
+    .summary-card.processing { background: var(--blue-bg); }
+    .summary-card.processing:hover { border-color: var(--blue); }
+    .summary-card.action { background: var(--yellow-bg); }
+    .summary-card.action:hover { border-color: var(--yellow); }
+    .summary-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .summary-val { font-size: 22px; font-weight: 700; }
+    .summary-card.ready .summary-val { color: var(--green); }
+    .summary-card.processing .summary-val { color: var(--blue); }
+    .summary-card.action .summary-val { color: var(--yellow); }
+    .summary-hint { font-size: 10px; color: var(--faint); margin-top: 6px; }
+
+    /* 検索 */
+    .search-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--surface); color: var(--ink); }
+    .search-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+
+    /* 進捗バー */
+    .progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 12px; }
+    .progress-label { min-width: 80px; color: var(--muted); }
+    .progress-bar-wrap { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+    .progress-bar-fill.green { background: var(--green); }
+    .progress-bar-fill.blue { background: var(--blue); }
+    .progress-bar-fill.yellow { background: var(--yellow); }
+    .progress-num { font-family: monospace; font-size: 11px; font-weight: 600; min-width: 50px; text-align: right; }
+
+    /* 空状態 */
+    .empty-state { padding: 40px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* ガイド・作業説明 */
+    .guide-box { background: var(--surface2); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 20px; font-size: 12px; line-height: 1.7; }
+    .guide-box h3 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .guide-box ul { margin: 6px 0 0 16px; padding: 0; }
+    .guide-box li { margin-bottom: 4px; }
+    .guide-box .label { font-weight: 600; color: var(--muted); margin-right: 4px; }
+    .task-meta { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 11px; color: var(--muted); }
+    .task-meta .why { margin-bottom: 4px; }
+    .task-meta .info { }
+
+        /* 業務マップ＆ステップナビ */
+    .biz-map { margin-bottom: 24px; }
+    .biz-map-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--ink); }
+    .biz-map-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+    .biz-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .biz-column { border-radius: 12px; padding: 20px; position: relative; }
+    .biz-column.collect { background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border: 2px solid var(--green); }
+    .biz-column.create { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid var(--blue); }
+    .biz-column-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .biz-column-icon { font-size: 24px; }
+    .biz-column-label { font-size: 15px; font-weight: 700; }
+    .biz-column-desc { font-size: 11px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+    .biz-step-list { display: flex; flex-direction: column; gap: 8px; }
+    .biz-step { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+    .biz-step:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-color: var(--border); }
+    .biz-step.locked { opacity: 0.35; cursor: default; pointer-events: none; }
+    .biz-step.locked:hover { transform: none; box-shadow: none; }
+    .biz-step-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; margin-top: 1px; }
+    .biz-step-num.green { background: var(--green); }
+    .biz-step-num.blue { background: var(--blue); }
+    .biz-step-num.purple { background: var(--purple); }
+    .biz-step-num.gray { background: var(--faint); }
+    .biz-step-info { flex: 1; min-width: 0; }
+    .biz-step-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .biz-step-detail { font-size: 10px; color: var(--muted); line-height: 1.5; }
+    .biz-step-badge { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; margin-top: 2px; }
+    .biz-step-badge.beginner { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+    .biz-step-badge.expert { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue); }
+    .biz-step-badge.leader { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
+    .role-legend { display: flex; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+    .role-legend-item { display: flex; align-items: center; gap: 6px; }
+    .role-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .role-legend-dot.green { background: var(--green); }
+    .role-legend-dot.blue { background: var(--blue); }
+    .role-legend-dot.purple { background: var(--purple); }
+    .your-tasks-highlight { background: rgba(255,255,255,0.9); border: 2px solid var(--green); border-radius: 10px; padding: 14px; margin-bottom: 20px; }
+    .your-tasks-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    @media (max-width: 768px) {
+      .biz-columns { grid-template-columns: 1fr; }
+    }
+
+    /* 申立書テンプレ集 */
+    .template-accordion { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .template-item { border-bottom: 1px solid var(--border); }
+    .template-item:last-child { border-bottom: none; }
+    .template-item summary { padding: 12px 16px; cursor: pointer; font-weight: 600; font-size: 13px; background: var(--surface2); list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    .template-item summary::-webkit-details-marker { display: none; }
+    .template-item summary::after { content: "▼"; font-size: 10px; color: var(--muted); }
+    .template-item[open] summary::after { content: "▲"; }
+    .template-item .template-body { padding: 14px 18px; background: var(--surface); font-size: 11px; line-height: 1.8; white-space: pre-wrap; max-height: 300px; overflow-y: auto; font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; }
+    .template-tags { font-size: 10px; color: var(--muted); margin-left: 8px; }
+
+    /* 証拠説明書ガイド（details） */
+    details.card summary::-webkit-details-marker { display: none; }
+    details.card summary::after { content: " ▼"; font-size: 11px; color: var(--muted); font-weight: 400; }
+    details.card[open] summary::after { content: " ▲"; }
+
+        /* レポートCSS → lngame.html に移動 */
+
+        /* リーダーボードCSS → lngame.html に移動 */
+
+        /* 書類ボックス詰めCSS → lnmanual.html に移動 */
+
+        /* ウェルカム成績CSS → lngame.html に移動（ポータルでは不使用） */
+
+        /* トップウェルカムCSS → 簡略版を下に定義 */
+
+        /* マニュアルページCSS → lnmanual.html に移動 */
+
+    .ln-view-mode-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ln-view-mode-tab { padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; color: var(--muted); }
+    .ln-view-mode-tab:hover { background: var(--border); color: var(--ink); }
+    .ln-view-mode-tab.active { background: var(--purple); color: white; border-color: var(--purple); }
+    /* LN状況（書類把握） */
+    .ln-status-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ln-status-tabs button { padding: 8px 14px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; color: var(--muted); }
+    .ln-status-tabs button:hover { background: var(--border); color: var(--ink); }
+    .ln-status-tabs button.active { background: var(--purple); color: white; border-color: var(--purple); }
+    .ln-status-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ln-status-table th, .ln-status-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .ln-status-table th { background: var(--surface2); font-weight: 600; color: var(--muted); }
+    .ln-status-table tr { cursor: pointer; }
+    .ln-status-table tr:hover { background: var(--surface2); }
+    .ln-status-table .doc-ok { color: var(--green); font-weight: 600; }
+    .ln-status-table .doc-ng { color: var(--red); }
+    .ln-status-table .status-go { background: var(--green-bg); }
+    .doc-cell { display: flex; align-items: center; gap: 8px; }
+    .doc-status-checkbox { 
+      appearance: none; -webkit-appearance: none; width: 18px; height: 18px; 
+      border: 2px solid #d1d5db; border-radius: 5px; cursor: pointer; 
+      transition: all 0.2s; background: white; position: relative; flex-shrink: 0;
+    }
+    .doc-status-checkbox:checked { 
+      background: #059669; border-color: #059669; 
+    }
+    .doc-status-checkbox:checked::after { 
+      content: '✓'; position: absolute; inset: 0; 
+      display: flex; align-items: center; justify-content: center; 
+      color: white; font-size: 12px; font-weight: 700; 
+    }
+    .doc-status-checkbox:hover { 
+      border-color: #9ca3af; transform: scale(1.05); 
+    }
+    
+    /* 要素番号バッジ */
+    .element-id {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      color: #9ca3af;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 2px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      cursor: help;
+      transition: all 0.2s;
+    }
+    .element-id:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+  
+        /* Promotion & Level CSS → lngame.html に移動 */
+
+</style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">LN PORTAL v3.0</div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">メニュー</div>
+        <a href="#" class="sidebar-nav-item active" onclick="showPanel('top'); return false;">📋 ホーム<span class="element-id" title="要素ID: P-01">P-01</span></a>
+        <a href="#" class="sidebar-nav-item" onclick="showPanel('list'); return false;">📄 LN一覧<span class="element-id" title="要素ID: P-02">P-02</span></a>
+        <a href="lnmanual.html" class="sidebar-nav-item" target="_blank">📚 マニュアル<span class="element-id" title="要素ID: P-03">P-03</span></a>
+        <a href="lngame.html" class="sidebar-nav-item" target="_blank">🎮 実績・レベル<span class="element-id" title="要素ID: P-04">P-04</span></a>
+      </div>
+      <div class="sidebar-feedback" id="sidebar-feedback">
+        <div class="sidebar-feedback-title">⚠️ 自動化できないこと</div>
+        <div class="sidebar-feedback-content" id="sidebar-feedback-content">LN詳細を開くと、自動化できなかった項目がここに表示されます。</div>
+        <a href="#" class="sidebar-feedback-link" onclick="openFeedbackModal(); return false;">📝 フィードバックを書く →</a>
+        <div id="feedback-log" style="margin-top: 12px; font-size: 10px; color: var(--muted); max-height: 100px; overflow-y: auto;"></div>
+      </div>
+    </aside>
+    <div class="main-area">
+  <header class="header">
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <span class="header-title">申立書作成ポータル</span>
+    </div>
+    <div class="header-actions">
+        <select id="user-select" onchange="setUser(this.value)" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; background: var(--surface); color: var(--ink); border: 1px solid var(--border); min-width: 140px;">
+          <optgroup label="beginner">
+            <option value="nobunaga">織田信長</option>
+            <option value="hideyoshi">豊臣秀吉</option>
+            <option value="ieyasu">徳川家康</option>
+          </optgroup>
+          <optgroup label="expert">
+            <option value="masamune">伊達政宗</option>
+            <option value="yukimura">真田幸村</option>
+            <option value="kenshin">上杉謙信</option>
+          </optgroup>
+          <optgroup label="leader">
+            <option value="yoritomo">源頼朝</option>
+            <option value="takauji">足利尊氏</option>
+          </optgroup>
+        </select>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ========== トップ: 業務全体マップ＋ロール別ステップ ========== -->
+    <div id="panel-top" class="panel active">
+
+      <!-- ウェルカム -->
+      <div id="top-welcome" class="card">
+        <div class="card-body" style="padding: 20px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">ログイン中</div>
+              <div style="font-size: 17px; font-weight: 700;"><span id="welcome-name">—</span> <span id="welcome-role" style="font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 10px;">—</span></div>
+            </div>
+            <div id="welcome-desc" style="font-size: 12px; color: var(--muted); max-width: 400px; line-height: 1.6;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- あなたの今日のタスク -->
+      <div id="your-tasks-card" class="card" style="border: 2px solid var(--green);">
+        <div class="card-head" style="background: var(--green-bg);">
+          <span class="card-title">🎯 あなたの今日のタスク</span>
+          <span id="your-tasks-role-badge" class="biz-step-badge beginner" style="font-size: 11px;">beginner</span>
+        </div>
+        <div class="card-body" id="your-tasks-body">
+          <!-- JSで動的に生成 -->
+        </div>
+      </div>
+
+      <!-- 業務全体マップ -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">🗺️ 業務全体マップ</span>
+          <span style="font-size: 11px; color: var(--muted);">色付き＝あなたの担当範囲</span>
+        </div>
+        <div class="card-body biz-map">
+          <p class="biz-map-subtitle">この仕事は大きく「<strong>A 証拠収集</strong>」と「<strong>B 申立書作成</strong>」の2つに分かれます。<br>あなたのロールに応じて、やるべきステップが段階的に増えていきます。</p>
+
+          <div class="biz-columns">
+            <!-- 左列: A 証拠収集 -->
+            <div class="biz-column collect">
+              <div class="biz-column-head">
+                <span class="biz-column-icon">📂</span>
+                <span class="biz-column-label">A 証拠収集</span>
+              </div>
+              <div class="biz-column-desc">各案件（LN）に必要な書類を集める作業。簡単なものから段階的に。</div>
+              <div class="biz-step-list" id="collect-steps">
+                <div class="biz-step" data-min-role="beginner" onclick="showPanel('list'); setListTab('ready');">
+                  <span class="biz-step-num green">A①</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">LN一覧を確認する</div>
+                    <div class="biz-step-detail">今日やるべきLNを一覧から見つけて選ぶ</div>
+                  </div>
+                  <span class="biz-step-badge beginner">beginner〜</span>
+                </div>
+                <div class="biz-step" data-min-role="beginner" onclick="openDetailOrPrompt();">
+                  <span class="biz-step-num green">A②</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">書類チェックリスト確認</div>
+                    <div class="biz-step-detail">LN詳細画面で必要書類が揃っているか確認する</div>
+                  </div>
+                  <span class="biz-step-badge beginner">beginner〜</span>
+                </div>
+                <div class="biz-step" data-min-role="beginner" onclick="openDetailOrPrompt();">
+                  <span class="biz-step-num green">A③</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">CSV・Driveフォルダ確認</div>
+                    <div class="biz-step-detail">ダウンロード済みファイルとフォルダ構成をチェック</div>
+                  </div>
+                  <span class="biz-step-badge beginner">beginner〜</span>
+                </div>
+                <div class="biz-step" data-min-role="expert" onclick="showPanel('list'); setListTab('action');">
+                  <span class="biz-step-num blue">A④</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">不足書類の手配</div>
+                    <div class="biz-step-detail">委任状・住民票など未取得書類の依頼・催促</div>
+                  </div>
+                  <span class="biz-step-badge expert">expert〜</span>
+                </div>
+                <div class="biz-step" data-min-role="expert" onclick="window.open('lnmanual.html?task=box','_blank');">
+                  <span class="biz-step-num blue">A⑤</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">書類ボックス詰め</div>
+                    <div class="biz-step-detail">収集完了した書類を規定の順番で整理・格納</div>
+                  </div>
+                  <span class="biz-step-badge expert">expert〜</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 右列: B 申立書作成 -->
+            <div class="biz-column create">
+              <div class="biz-column-head">
+                <span class="biz-column-icon">📝</span>
+                <span class="biz-column-label">B 申立書作成</span>
+              </div>
+              <div class="biz-column-desc">収集した情報をもとに、裁判所に提出する申立書を作成する作業。</div>
+              <div class="biz-step-list" id="create-steps">
+                <div class="biz-step" data-min-role="expert" onclick="showPanel('list'); setListTab('ready');">
+                  <span class="biz-step-num blue">B①</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">申立書テンプレート利用</div>
+                    <div class="biz-step-detail">用意されたテンプレートにLN情報を流し込む</div>
+                  </div>
+                  <span class="biz-step-badge expert">expert〜</span>
+                </div>
+                <div class="biz-step" data-min-role="expert" onclick="openDetailOrPrompt();">
+                  <span class="biz-step-num blue">B②</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">証拠説明書の作成</div>
+                    <div class="biz-step-detail">証拠リストを整理し、説明書を自動生成</div>
+                  </div>
+                  <span class="biz-step-badge expert">expert〜</span>
+                </div>
+                <div class="biz-step" data-min-role="leader" onclick="openDetailOrPrompt();">
+                  <span class="biz-step-num purple">B③</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">内容確認・修正</div>
+                    <div class="biz-step-detail">生成された申立書の内容を精査し、必要に応じて修正</div>
+                  </div>
+                  <span class="biz-step-badge leader">leader</span>
+                </div>
+                <div class="biz-step" data-min-role="leader" onclick="alert('モック: 最終提出フロー');">
+                  <span class="biz-step-num purple">B④</span>
+                  <div class="biz-step-info">
+                    <div class="biz-step-name">最終承認・提出</div>
+                    <div class="biz-step-detail">最終チェック後、裁判所への提出を承認する</div>
+                  </div>
+                  <span class="biz-step-badge leader">leader</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ロール凡例 -->
+          <div class="role-legend">
+            <div class="role-legend-item"><span class="role-legend-dot green"></span> beginner — 証拠収集（簡単なもの）</div>
+            <div class="role-legend-item"><span class="role-legend-dot blue"></span> expert — 証拠収集全部＋申立書の一部</div>
+            <div class="role-legend-item"><span class="role-legend-dot purple"></span> leader — すべて＋チーム管理</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- leader専用: チーム管理 -->
+      <div id="leader-team-overview" class="card" style="display: none;" data-role-only="leader">
+        <div class="card-head" style="background: var(--purple-bg);">
+          <span class="card-title">👔 チーム管理</span>
+        </div>
+        <div class="card-body">
+          <div class="summary-grid" style="margin-bottom: 16px;" id="expert-summary-grid">
+            <div class="summary-card all" onclick="showPanel('list'); setListTab('all');"><div class="summary-label">全LN</div><div class="summary-val" id="summary-all">—</div></div>
+            <div class="summary-card ready" onclick="showPanel('list'); setListTab('ready');"><div class="summary-label">すぐ作成可能</div><div class="summary-val" id="summary-ready">—</div></div>
+            <div class="summary-card processing" onclick="showPanel('list'); setListTab('processing');"><div class="summary-label">pl処理中</div><div class="summary-val" id="summary-processing">—</div></div>
+            <div class="summary-card action" onclick="showPanel('list'); setListTab('action');"><div class="summary-label">要対応</div><div class="summary-val" id="summary-action">—</div></div>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="#" class="btn btn-primary" onclick="showPanel('list'); setListViewMode('status'); return false;">📋 LN一覧・書類把握<span class="element-id" title="要素ID: P-14">P-14</span></a>
+            <a href="lngame.html?panel=report" target="_blank" class="btn btn-secondary">📊 日次レポート<span class="element-id" title="要素ID: P-15">P-15</span></a>
+            <a href="lngame.html?panel=leaderboard" target="_blank" class="btn btn-secondary">🏆 リーダーボード<span class="element-id" title="要素ID: P-16">P-16</span></a>
+            <button class="btn btn-secondary" onclick="alert('モック: 新規LN登録');">➕ 新規LN登録<span class="element-id" title="要素ID: P-17">P-17</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 完了報告ボタン -->
+      <div class="card">
+        <div class="card-body" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px;">
+          <div style="font-size: 13px; color: var(--muted);">今日の作業が終わったら →</div>
+          <button type="button" class="btn btn-primary" onclick="window.open('lngame.html?panel=report&user='+currentUser.id,'_blank');">✅ 本日の完了報告<span class="element-id" title="要素ID: P-18">P-18</span></button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 完了フロー → lngame.html に移動 -->
+
+    <!-- フィードバックモーダル（自動化できないこと） -->
+    <div id="feedback-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; padding: 24px;">
+      <div class="card" style="max-width: 480px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+        <div class="card-head" style="background: var(--yellow-bg);">
+          <span class="card-title">⚠️ 自動化できないこと — フィードバック</span>
+          <button type="button" onclick="closeFeedbackModal()" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; line-height: 1;">×</button>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">自動化できなかった項目や、手動対応が必要な内容を記載してください。</p>
+          <textarea id="feedback-textarea" placeholder="例：plが3件処理中のまま。ハッシュ不一致のため手動確認が必要。&#10;例：委任状が未収集。申立人に依頼中。" style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; resize: vertical; font-family: inherit;" rows="5"></textarea>
+          <div style="margin-top: 16px; display: flex; gap: 10px;">
+            <button type="button" class="btn btn-primary" onclick="submitFeedback()">送信</button>
+            <button type="button" class="btn btn-secondary" onclick="closeFeedbackModal()">キャンセル</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========== LN一覧・状況（統合） ========== -->
+    <div id="panel-list" class="panel">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="showPanel('top')">← ホーム</button>
+        <span id="list-role-hint" style="font-size: 12px; color: var(--muted); align-self: center;"></span>
+      </div>
+      <!-- 表示モード切替 -->
+      <div class="ln-view-mode-tabs" style="display: flex; gap: 4px; margin-bottom: 16px;">
+        <button class="ln-view-mode-tab active" data-view="list" onclick="setListViewMode('list')">📄 一覧<span class="element-id" title="要素ID: P-20">P-20</span></button>
+        <button class="ln-view-mode-tab" data-view="status" onclick="setListViewMode('status')">📋 書類把握<span class="element-id" title="要素ID: P-21">P-21</span></button>
+      </div>
+
+      <!-- 一覧表示 -->
+      <div id="ln-view-list" class="ln-view-content">
+        <div class="tabs" role="tablist">
+          <button class="tab" data-tab="all" onclick="setListTab('all')" title="全LNを表示">全LN <span class="count">13件</span><span class="element-id" title="要素ID: P-22">P-22</span></button>
+          <button class="tab" data-tab="ready" onclick="setListTab('ready')" title="申立書作成の準備ができているLN（beginnerはこれ）">今日やること <span class="count">8件</span><span class="element-id" title="要素ID: P-23">P-23</span></button>
+          <button class="tab" data-tab="action" onclick="setListTab('action')" title="目的: 委任状待ち・代表者事項証明書待ちなど対応が必要なLN">要対応 <span class="count">5件</span><span class="element-id" title="要素ID: P-24">P-24</span></button>
+          <button class="tab" data-tab="processing" onclick="setListTab('processing')" title="目的: pl（PDF生成）処理中のLN">pl処理中 <span class="count">0件</span><span class="element-id" title="要素ID: P-25">P-25</span></button>
+        </div>
+        <div class="search-row">
+          <input type="text" class="search-input" placeholder="訴番・申立人・相手方で検索..." id="ln-search">
+          <button class="btn btn-secondary" onclick="filterLnList()">検索</button>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">LN一覧</span>
+            <span style="font-size: 12px; color: var(--muted);" id="ln-list-count">全13件</span>
+          </div>
+          <div class="card-body" style="padding: 0;" id="ln-list-body">
+          <!-- Dynamically rendered by renderLnList() -->
+        </div>
+      </div>
+      </div>
+
+      <!-- 書類把握表示 -->
+      <div id="ln-view-status" class="ln-view-content" style="display: none;">
+        <div class="card">
+          <div class="card-head" style="background: var(--purple-bg);">
+            <span class="card-title">📋 書類把握</span>
+            <span style="font-size: 12px; color: var(--muted);">委任状・KKが揃ったLNから申立書作成を進める</span>
+          </div>
+          <div class="card-body">
+            <div style="background: var(--yellow-bg); border: 1px solid var(--yellow); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px;">
+              <strong>進め方：</strong> 委任状とKKが揃ったLN（A 証拠収集完了）からB 申立書作成を進めます。それまでは委任状・KK収集に集中してください。
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+              <div class="ln-status-tabs">
+                <button class="ln-status-tab active" data-ln-status-filter="all" onclick="setLnStatusFilter('all')">全件<span class="element-id" title="要素ID: P-26">P-26</span></button>
+                <button class="ln-status-tab" data-ln-status-filter="go" onclick="setLnStatusFilter('go')">✅ 委任状・KK揃い（進める）<span class="element-id" title="要素ID: P-27">P-27</span></button>
+                <button class="ln-status-tab" data-ln-status-filter="collect" onclick="setLnStatusFilter('collect')">⏳ 委任状・KK収集中<span class="element-id" title="要素ID: P-28">P-28</span></button>
+              </div>
+              <button onclick="generateRequestText()" style="padding:8px 16px;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3);transition:all 0.2s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(59,130,246,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(59,130,246,0.3)'">
+                📋 まとめて作成依頼<span class="element-id" style="background:#fff;color:#3b82f6" title="要素ID: P-29">P-29</span>
+              </button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="ln-status-table" id="ln-status-table">
+                <thead>
+                  <tr>
+                    <th>LN</th>
+                    <th>申立人/相手方</th>
+                    <th>委任状</th>
+                    <th>KK<br><small>DB記録印刷書面</small></th>
+                    <th>証拠用USB</th>
+                    <th>代表者事項</th>
+                    <th>状況</th>
+                  </tr>
+                </thead>
+                <tbody id="ln-status-body"><!-- 動的生成 --></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========== 申立書テンプレ集 ========== -->
+    <div id="panel-templates" class="panel">
+      <div class="guide-box">
+        <h3>📝 申立書テンプレ集 — 「（１）申立人が本件著作物の著作権者であること」の編集用</h3>
+        <p>申立書の著作権者立証部分のテンプレート。CP（メーカー）・パターンに応じて選択し、●部分を編集して使用。</p>
+        <p style="font-size: 11px; color: var(--muted); margin-top: 8px;">※このHTML単体で動作します（外部ファイル不要）</p>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="showPanel('list')">← LN一覧に戻る</button>
+      </div>
+
+      <!-- 申立書種類と必要な別紙 -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-head">
+          <span class="card-title">📌 申立書の種類（どれか選ぶ）</span>
+        </div>
+        <div class="card-body">
+          <label for="doc-type-select" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px;">申立書の種類</label>
+          <select id="doc-type-select" onchange="setDocType(this.value)" style="width: 100%; max-width: 480px; padding: 10px 14px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); margin-bottom: 12px;">
+            <option value="open">発信者情報開示命令書</option>
+            <option value="delete">発信者情報開示命令書兼消去禁止命令申立書</option>
+            <option value="provide">発信者情報開示命令書兼提供命令申立書</option>
+          </select>
+          <div id="doc-type-desc" style="font-size: 12px; color: var(--muted); line-height: 1.7; padding: 12px; background: var(--surface2); border-radius: 8px;">
+            <strong>発信者情報開示命令書</strong> — 開示請求のみ。必要別紙: 当事者目録、著作物目録、動画目録、発信者情報目録（１）。
+          </div>
+        </div>
+      </div>
+
+      <!-- 申立書 全体構成サンプル -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-head">
+          <span class="card-title">📋 申立書 全体構成サンプル</span>
+        </div>
+        <div class="card-body">
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+              <span>種類:</span>
+              <select id="full-doc-type" onchange="updateFullDocSample()" style="padding: 6px 10px; font-size: 12px; border-radius: 6px;">
+                <option value="open">発信者情報開示命令書</option>
+                <option value="delete">開示＋消去禁止</option>
+                <option value="provide">開示＋提供命令</option>
+              </select>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+              <span>著作権者立証:</span>
+              <select id="copyright-proof" onchange="updateFullDocSample()" style="padding: 6px 10px; font-size: 12px; border-radius: 6px;">
+                <option value="kantoku">監督あり</option>
+                <option value="mukantoku">監督なし</option>
+              </select>
+            </label>
+          </div>
+          <div id="full-doc-sample" class="template-body" style="font-size: 10px; line-height: 1.7; max-height: 500px; overflow-y: auto; white-space: pre-wrap; font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;"></div>
+        </div>
+      </div>
+
+      <!-- CP別テンプレ早見表 -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-head">
+          <span class="card-title">CP別テンプレ早見</span>
+        </div>
+        <div class="card-body" style="font-size: 11px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;">
+            <span><strong>ナチュ</strong> → ①パッケージ or ナチュ分割販売</span>
+            <span><strong>CONT</strong> → ②確認書 or Cont複数監督</span>
+            <span><strong>キングダム</strong> → ②確認書</span>
+            <span><strong>MBM</strong> → MBM（職務著作）</span>
+            <span><strong>hmp</strong> → hmp1 or hmp2</span>
+            <span><strong>ベンハー</strong> → ベンハー公式/譲渡</span>
+            <span><strong>プレステージ</strong> → プレステージ商号・商標</span>
+            <span><strong>監督なし</strong> → ①パッケージ（著作表記）</span>
+            <span><strong>監督あり</strong> → ②確認書系</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- プルダウンでテンプレ選択 -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-head">
+          <span class="card-title">テンプレートを選択</span>
+        </div>
+        <div class="card-body">
+          <label for="template-select" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px;">（１）申立人が本件著作物の著作権者であること — 編集用テンプレ</label>
+          <select id="template-select" onchange="showTemplate(this.value)" style="width: 100%; max-width: 480px; padding: 10px 14px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+            <option value="">— 選択してください —</option>
+            <optgroup label="①パッケージ系">
+              <option value="pkg1">①パッケージに著作表記があるパターン（ナチュ等）</option>
+              <option value="nacha-split">ナチュ（分割販売分）</option>
+            </optgroup>
+            <optgroup label="②確認書系">
+              <option value="confirm2">②販売サイト＋確認書（複数監督）</option>
+              <option value="confirm2b">②の２ 同人に変えた監督パターン</option>
+              <option value="kadachiyama">角地山先生の確認書（複数）</option>
+              <option value="generic">汎用確認書パターン（甲14項目削除版）</option>
+            </optgroup>
+            <optgroup label="河田先生提出用">
+              <option value="groove">グルーヴ・ラボ</option>
+              <option value="cont-kawata">Cont（河田先生版）</option>
+              <option value="hohohosha">方々社（河田先生版）</option>
+              <option value="horizon">Horizon（河田先生修正・社長確認書）</option>
+            </optgroup>
+            <optgroup label="MBM・hmp">
+              <option value="mbm">MBM（河田先生修正版・職務著作）</option>
+              <option value="hmp1">hmp1（製作・発売・販売表記）</option>
+              <option value="hmp2">hmp2（複合版・大塚先生編集）</option>
+            </optgroup>
+            <optgroup label="ベンハー">
+              <option value="benhur-transfer">ベンハー（譲渡契約書・最近は基本使わない）</option>
+              <option value="benhur2">ベンハー２（河田先生以外はこっちでもOK）</option>
+              <option value="benhur-kawata">ベンハー（河田先生修正版・公式サイト）</option>
+            </optgroup>
+            <optgroup label="プレステージ・ホット">
+              <option value="prestige1">プレステージ（商号・商標）</option>
+              <option value="prestige2">プレステージ２（河田先生修正版）</option>
+              <option value="hot">ホットエンターテイメント</option>
+            </optgroup>
+            <optgroup label="Cont・ブルーコーナー・その他CP">
+              <option value="cont-multi">Cont（同一作品に複数監督）</option>
+              <option value="blue-normal">ブルーコーナー（通常版）</option>
+              <option value="blue-kawata">ブルーコーナー（河田先生修正版）</option>
+              <option value="mka">エムケイエイチ</option>
+              <option value="kspro">KSプロ</option>
+            </optgroup>
+            <optgroup label="証拠説明書（甲号証）">
+              <option value="ev-standard">証拠説明書（標準構成）</option>
+              <option value="ev-mbm">MBM 証拠説明書</option>
+              <option value="ev-hot">ホットエンターテイメント 証拠説明書</option>
+              <option value="ev-multi">複数品番の証拠説明書用</option>
+              <option value="ev-benhur">ベンハー（譲渡契約書の場合）証拠</option>
+              <option value="ev-trademark">商標を使う場合（プレステージ等）</option>
+              <option value="ev-kmp">KMP・合意締結証明書セット</option>
+              <option value="ev-kawata">河田先生 確認書パターン証拠（甲14の１・２）</option>
+              <option value="ev-hohohosha">方々社 証拠説明書</option>
+              <option value="ev-blue">ブルーコーナー 証拠説明書</option>
+              <option value="ev-nacha">ナチュ（分割販売）証拠説明書</option>
+              <option value="ev-mka">エムケイエイチ 証拠説明書</option>
+              <option value="ev-kspro">KSプロ 証拠説明書</option>
+            </optgroup>
+          </select>
+          <div id="template-preview" class="template-body" style="margin-top: 16px; min-height: 80px; white-space: pre-wrap; font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 11px; line-height: 1.8; padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; color: var(--muted);">テンプレートを選択するとここに表示されます。●部分を編集して使用してください。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日次レポート → lngame.html に移動 -->
+
+    <!-- リーダーボード → lngame.html に移動 -->
+
+  </main>
+    </div>
+  </div>
+
+  <script src="db_case.js"></script>
+  <!-- db_game.js → lngame.html のみが読み込み -->
+  <script>
+    let currentListTab = 'all';
+    // USERS は db_case.js で定義済み（ゲームデータはlngame.html側で合成）
+    let currentUser = USERS[0];
+    let currentRole = 'beginner';
+
+
+
+    // ゲーム関連関数（getLevelInfo, renderPromotionCard, renderLevelBar 等） → lngame.html に移動
+
+    // 作業ログは db_case.js の actionLog で定義済み
+
+        // LN_STATUS_DATA は db_case.js で定義済み
+
+// markTaskDone → lngame.html に移動
+
+    // showCompletionFlow → lngame.html に移動
+
+    const FEEDBACK_STORAGE_KEY = 'ln-portal-feedback';
+    function getStoredFeedback() {
+      try {
+        const raw = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (_) { return []; }
+    }
+    function saveFeedback(arr) {
+      try { localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(arr)); } catch (_) {}
+    }
+    function renderFeedbackLog() {
+      const el = document.getElementById('feedback-log');
+      if (!el) return;
+      const list = getStoredFeedback();
+      if (list.length === 0) {
+        el.innerHTML = '<span style="color: var(--faint);">書いたフィードバックはここに表示されます</span>';
+        return;
+      }
+      el.innerHTML = list.slice(-10).reverse().map((f, i) => {
+        const ln = f.ln ? '[' + f.ln + '] ' : '';
+        const at = f.at ? new Date(f.at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        return '<div style="margin-bottom: 6px; padding: 6px 8px; background: var(--surface2); border-radius: 6px; font-size: 10px;"><span style="color: var(--muted);">' + at + (ln ? ' ' + ln : '') + '</span><br>' + (f.text || '').substring(0, 80) + ((f.text || '').length > 80 ? '…' : '') + '</div>';
+      }).join('');
+    }
+
+    function openFeedbackModal() {
+      const modal = document.getElementById('feedback-modal');
+      const ta = document.getElementById('feedback-textarea');
+      if (!modal || !ta) return;
+      ta.value = currentDetailLn ? '[' + currentDetailLn + '] ' : '';
+      modal.style.display = 'flex';
+      ta.focus();
+    }
+
+    function closeFeedbackModal() {
+      const modal = document.getElementById('feedback-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitFeedback() {
+      const ta = document.getElementById('feedback-textarea');
+      if (!ta) return;
+      const text = (ta.value || '').trim();
+      if (!text) {
+        alert('フィードバックを入力してください。');
+        return;
+      }
+      const list = getStoredFeedback();
+      list.push({
+        text: text,
+        ln: currentDetailLn || null,
+        at: new Date().toISOString(),
+        user: currentUser?.name || null
+      });
+      saveFeedback(list);
+      renderFeedbackLog();
+      ta.value = '';
+      closeFeedbackModal();
+      alert('フィードバックを保存しました。');
+    }
+
+    let currentDetailLn = '';
+
+    function openDetailOrPrompt() {
+      // panel-detail 削除済み — LN一覧に直接遷移
+      showPanel('list');
+      setListTab('ready');
+    }
+
+    function markLnCheckDone() {
+      const ln = currentDetailLn || '—';
+      alert('✅ LN確認完了: ' + ln);
+    }
+
+
+
+
+    // updateLeaderboardPanel → lngame.html に移動
+
+
+    // updateReportPanel → lngame.html に移動
+
+    // ロール階層: beginner < expert < leader
+    const ROLE_LEVEL = { beginner: 0, expert: 1, leader: 2 };
+
+    function applyRoleView() {
+      const roleLabel = { beginner: 'beginner', expert: 'expert', leader: 'leader' };
+      const roleColor = { beginner: 'var(--green)', expert: 'var(--blue)', leader: 'var(--purple)' };
+      const roleBg = { beginner: 'var(--green-bg)', expert: 'var(--blue-bg)', leader: 'var(--purple-bg)' };
+      const roleDesc = {
+        beginner: '書類集めの基本作業（LN確認・チェックリスト・フォルダ確認）を担当します',
+        expert: '書類集め全般＋申立書テンプレ利用・証拠説明書作成を担当します',
+        leader: '全業務＋申立書の最終確認・承認・チーム管理を担当します'
+      };
+
+      // ウェルカム
+      const wn = document.getElementById('welcome-name');
+      const wr = document.getElementById('welcome-role');
+      const wd = document.getElementById('welcome-desc');
+      if (wn) wn.textContent = currentUser.name + ' さん';
+      if (wr) {
+        wr.textContent = roleLabel[currentRole];
+        wr.style.color = roleColor[currentRole];
+        wr.style.background = roleBg[currentRole];
+      }
+      if (wd) wd.textContent = roleDesc[currentRole] || '';
+
+      // data-role-only 属性で表示制御
+      document.querySelectorAll('[data-role-only]').forEach(el => {
+        const roles = (el.dataset.roleOnly || '').split(',').map(s => s.trim());
+        el.style.display = roles.includes(currentRole) ? '' : 'none';
+      });
+
+      // 業務マップのステップ: ロール未満は locked
+      const myLevel = ROLE_LEVEL[currentRole] || 0;
+      document.querySelectorAll('.biz-step[data-min-role]').forEach(el => {
+        const minLevel = ROLE_LEVEL[el.dataset.minRole] || 0;
+        if (minLevel > myLevel) {
+          el.classList.add('locked');
+        } else {
+          el.classList.remove('locked');
+        }
+      });
+
+      // 「あなたの今日のタスク」カード生成
+      updateYourTasks();
+
+      // 「あなたの今日のタスク」カードのスタイルをロールに合わせる
+      const ytCard = document.getElementById('your-tasks-card');
+      const ytBadge = document.getElementById('your-tasks-role-badge');
+      if (ytCard) {
+        ytCard.style.borderColor = roleColor[currentRole];
+      }
+      if (ytBadge) {
+        ytBadge.className = 'biz-step-badge ' + currentRole;
+        ytBadge.style.fontSize = '11px';
+        ytBadge.textContent = roleLabel[currentRole];
+      }
+
+      // LN一覧ガイド
+      const lgb = document.getElementById('list-guide-box');
+      const lrh = document.getElementById('list-role-hint');
+      if (lgb) lgb.innerHTML = currentRole === 'beginner' ? '<strong>作業:</strong> 準備完了のLNを確認 → 問題なければ報告' : '<strong>作業:</strong> LN一覧から対象を選択して対応';
+      if (lrh) lrh.innerHTML = currentRole === 'beginner' ? '💡 「今日やること」タブで、あなたの作業が見つかります' : '💡 全タブ表示。フィルタで効率よく探せます';
+    }
+
+    function updateYourTasks() {
+      const body = document.getElementById('your-tasks-body');
+      if (!body) return;
+      const tasks = [];
+      if (currentRole === 'beginner') {
+        tasks.push(
+          { icon: '1️⃣', name: 'A① LN一覧を確認する', desc: '「今日やること」タブからLNを選ぶ', action: "showPanel('list'); setListTab('ready');" },
+          { icon: '2️⃣', name: 'A② 書類チェックリスト確認', desc: 'LN詳細で必要書類を確認', action: "openDetailOrPrompt();" },
+          { icon: '3️⃣', name: 'A③ CSV・Driveフォルダ確認', desc: 'ファイルが揃っているかチェック', action: "openDetailOrPrompt();" },
+          { icon: '✅', name: '完了報告', desc: '問題なければ報告して終了', action: "window.open('lngame.html?panel=report&user='+currentUser.id,'_blank');" }
+        );
+      } else if (currentRole === 'expert') {
+        tasks.push(
+          { icon: '📂', name: 'A 証拠収集（全般）', desc: 'LN確認→チェック→不足書類の手配→ボックス詰め', action: "showPanel('list'); setListTab('ready');" },
+          { icon: '📝', name: 'B① 申立書テンプレート利用', desc: '準備完了LNのテンプレートに情報を流し込む', action: "showPanel('list'); setListTab('ready');" },
+          { icon: '📋', name: 'B② 証拠説明書の作成', desc: '証拠リストを整理し説明書を自動生成', action: "openDetailOrPrompt();" },
+          { icon: '⚠️', name: '要対応LNを処理', desc: '不足や問題のあるLNに対応', action: "showPanel('list'); setListTab('action');" },
+          { icon: '✅', name: '完了報告', desc: '本日の対応を報告', action: "window.open('lngame.html?panel=report&user='+currentUser.id,'_blank');" }
+        );
+      } else {
+        tasks.push(
+          { icon: '📊', name: 'チーム状況確認', desc: 'LN全体の進捗・書類状況を把握', action: "showPanel('list'); setListViewMode('status');" },
+          { icon: '📂', name: 'A 証拠収集・B 申立書作成', desc: '全工程を実施（証拠収集〜申立書作成）', action: "showPanel('list'); setListTab('all');" },
+          { icon: '🔍', name: 'B③ 内容確認・修正', desc: '生成された申立書を精査し修正', action: "openDetailOrPrompt();" },
+          { icon: '✔️', name: 'B④ 最終承認・提出', desc: '最終チェック後、提出を承認', action: "alert('モック: 最終提出フロー');" },
+          { icon: '✅', name: '完了報告', desc: '本日の対応を報告', action: "window.open('lngame.html?panel=report&user='+currentUser.id,'_blank');" }
+        );
+      }
+      body.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;">' + tasks.map((t, i) =>
+        '<div onclick="' + t.action + '" style="flex:1;min-width:140px;max-width:220px;cursor:pointer;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);transition:all 0.2s;" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.06)\'" onmouseout="this.style.transform=\'none\';this.style.boxShadow=\'none\'">' +
+          '<div style="font-size:20px;margin-bottom:6px;">' + t.icon + '</div>' +
+          '<div style="font-size:12px;font-weight:600;margin-bottom:2px;">' + t.name + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);line-height:1.4;">' + t.desc + '</div>' +
+        '</div>'
+      ).join('') + '</div>';
+    }
+
+    function setUser(userId) {
+      const u = USERS.find(x => x.id === userId) || USERS[0];
+      currentUser = u;
+      currentRole = u.role;
+      const sel = document.getElementById('user-select');
+      if (sel) sel.value = u.id;
+      // タブ表示制御
+      const allTab = document.querySelector('[data-tab="all"]');
+      const actionTab = document.querySelector('[data-tab="action"]');
+      const processingTab = document.querySelector('[data-tab="processing"]');
+      if (currentRole === 'beginner') {
+        if (allTab) allTab.style.display = '';
+        if (actionTab) actionTab.style.display = 'none';
+        if (processingTab) processingTab.style.display = 'none';
+      } else {
+        if (allTab) allTab.style.display = '';
+        if (actionTab) actionTab.style.display = '';
+        if (processingTab) processingTab.style.display = '';
+      }
+      applyRoleView();
+    }
+
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      const panel = document.getElementById('panel-' + id);
+      if (panel) panel.classList.add('active');
+      // パネル切替時にスクロールを先頭に戻す
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelectorAll('.sidebar-nav-item').forEach(el => el.classList.remove('active'));
+      const navMap = { top: 0, list: 1 };
+      // detail/templates/boxはlistの子パネルとして扱い、listをハイライト
+      const resolvedId = (id === 'detail' || id === 'templates' || id === 'box') ? 'list' : id;
+      const idx = navMap[resolvedId];
+      if (typeof idx === 'number') {
+        const navs = document.querySelectorAll('.sidebar-nav-item');
+        if (navs[idx]) navs[idx].classList.add('active');
+      }
+      if (id === 'list') {
+        // beginner初回は'ready'、それ以外は現在のタブ状態を維持（初回は'all'）
+        if (currentRole === 'beginner') setListTab('ready');
+        else setListTab(currentListTab || 'all');
+        updateLnStatusTable();
+      }
+      // レポート・リーダーボードはlngame.htmlに移動済み
+      if (id !== 'detail') updateSidebarFeedback(null, null);
+    }
+
+    let currentLnStatusFilter = 'all';
+    function setLnStatusFilter(filter) {
+      currentLnStatusFilter = filter || 'all';
+      document.querySelectorAll('.ln-status-tab').forEach(t => t.classList.toggle('active', t.dataset.lnStatusFilter === currentLnStatusFilter));
+      updateLnStatusTable();
+    }
+    function updateLnStatusTable() {
+      const tbody = document.getElementById('ln-status-body');
+      if (!tbody) return;
+      
+      // localStorageから保存されたステータスを読み込み
+      const savedStatuses = JSON.parse(localStorage.getItem('ln_doc_statuses') || '{}');
+      const allLNChecklists = JSON.parse(localStorage.getItem('all_ln_checklists') || '{}');
+      
+      // LN_STATUS_DATAを更新（ln_doc_statusesとall_ln_checklistsの両方から）
+      LN_STATUS_DATA.forEach(r => {
+        // 書類把握で直接設定した値
+        if (savedStatuses[r.ln]) {
+          r.p = savedStatuses[r.ln].p !== undefined ? savedStatuses[r.ln].p : r.p;
+          r.kk = savedStatuses[r.ln].kk !== undefined ? savedStatuses[r.ln].kk : r.kk;
+          r.usb = savedStatuses[r.ln].usb !== undefined ? savedStatuses[r.ln].usb : r.usb;
+          r.cert = savedStatuses[r.ln].cert !== undefined ? savedStatuses[r.ln].cert : r.cert;
+        }
+        
+        // lnmake.htmlからの値で上書き（より新しい場合）
+        if (allLNChecklists[r.ln]) {
+          const lnCheck = allLNChecklists[r.ln];
+          if (lnCheck.inin !== undefined) r.p = lnCheck.inin;
+          if (lnCheck.cert !== undefined) r.cert = lnCheck.cert;
+          if (lnCheck.usb !== undefined) r.usb = lnCheck.usb;
+        }
+      });
+      
+      let list = LN_STATUS_DATA;
+      if (currentLnStatusFilter === 'go') list = list.filter(r => r.p && r.kk);
+      else if (currentLnStatusFilter === 'collect') list = list.filter(r => !r.p || !r.kk);
+      
+      const docCell = (lnId, field, value) => {
+        const checked = value ? 'checked' : '';
+        const status = value ? '<span class="doc-ok">〇</span>' : '<span class="doc-ng">×</span>';
+        return `<div class="doc-cell">
+          <input type="checkbox" class="doc-status-checkbox" ${checked} 
+            onchange="toggleDocStatus('${lnId}', '${field}', this.checked)"
+            title="${value ? '✓ 完了' : '× 未完了'} - クリックで変更">
+          ${status}
+        </div>`;
+      };
+      
+      const rows = list.map(r => {
+        const canGo = r.p && r.kk;
+        const rowClass = canGo ? 'status-go' : '';
+        const status = canGo ? '進める' : (!r.p && !r.kk ? '委任状・KK収集中' : r.p ? 'KK収集中' : '委任状収集中');
+        return `<tr class="${rowClass}">
+          <td><strong>${r.ln}</strong></td>
+          <td>${r.cp} / ${r.partner}</td>
+          <td>${docCell(r.ln, 'p', r.p)}</td>
+          <td>${docCell(r.ln, 'kk', r.kk)}</td>
+          <td>${docCell(r.ln, 'usb', r.usb)}</td>
+          <td>${docCell(r.ln, 'cert', r.cert)}</td>
+          <td>${status}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = rows.join('');
+    }
+    
+    // 書類ステータスを更新
+    function toggleDocStatus(lnId, field, isChecked) {
+      // localStorageに保存
+      const savedStatuses = JSON.parse(localStorage.getItem('ln_doc_statuses') || '{}');
+      if (!savedStatuses[lnId]) {
+        savedStatuses[lnId] = {};
+      }
+      savedStatuses[lnId][field] = isChecked;
+      localStorage.setItem('ln_doc_statuses', JSON.stringify(savedStatuses));
+      
+      // all_ln_checklistsも更新（lnmake.htmlとの連携）
+      const allLNChecklists = JSON.parse(localStorage.getItem('all_ln_checklists') || '{}');
+      if (!allLNChecklists[lnId]) {
+        allLNChecklists[lnId] = {};
+      }
+      // フィールド名のマッピング
+      const fieldMap = {
+        'p': 'inin',      // 委任状
+        'cert': 'cert',   // 証明書
+        'usb': 'usb',     // USB
+        'kk': 'kk'        // KKは参考情報として保存
+      };
+      if (fieldMap[field]) {
+        allLNChecklists[lnId][fieldMap[field]] = isChecked;
+      }
+      allLNChecklists[lnId].lastUpdated = new Date().toISOString();
+      localStorage.setItem('all_ln_checklists', JSON.stringify(allLNChecklists));
+      
+      // lnmake.html用の個別チェックリストも更新（完全同期）
+      const lnChecklistKey = `ln_checklist_${lnId}`;
+      const lnChecklist = JSON.parse(localStorage.getItem(lnChecklistKey) || '{}');
+      const taskIdMap = {
+        'p': 'task-inin',
+        'cert': 'task-cert',
+        'usb': 'task-usb',
+        'kk': 'task-kk'
+      };
+      if (taskIdMap[field]) {
+        lnChecklist[taskIdMap[field]] = isChecked;
+        localStorage.setItem(lnChecklistKey, JSON.stringify(lnChecklist));
+      }
+      
+      // テーブルを再描画
+      updateLnStatusTable();
+      
+      // LN一覧も更新（準備状況に反映）
+      if (typeof renderLnList === 'function') {
+        renderLnList();
+      }
+      
+      console.log(`✓ ${lnId} の ${field} を ${isChecked ? '完了' : '未完了'} に更新しました（lnmake.htmlと同期）`);
+    }
+
+
+    // マニュアル関連JS → lnmanual.html に移動
+
+    let currentListViewMode = 'list';
+    function setListViewMode(mode) {
+      currentListViewMode = mode || 'list';
+      document.querySelectorAll('.ln-view-mode-tab').forEach(t => t.classList.toggle('active', t.dataset.view === currentListViewMode));
+      const listEl = document.getElementById('ln-view-list');
+      const statusEl = document.getElementById('ln-view-status');
+      if (listEl) listEl.style.display = currentListViewMode === 'list' ? '' : 'none';
+      if (statusEl) statusEl.style.display = currentListViewMode === 'status' ? '' : 'none';
+      if (currentListViewMode === 'status') updateLnStatusTable();
+    }
+
+    function setListTab(tab) {
+      currentListTab = tab;
+      document.querySelectorAll('#panel-list .tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      // 検索フィルタも考慮して再フィルタ
+      const q = (document.getElementById('ln-search')?.value || '').toLowerCase().trim();
+      let visible = 0;
+      document.querySelectorAll('.ln-card').forEach(row => {
+        const status = row.dataset.status;
+        let tabMatch = true;
+        if (tab === 'ready') tabMatch = status === 'ready';
+        else if (tab === 'action') tabMatch = status === 'action';
+        else if (tab === 'processing') tabMatch = status === 'processing';
+        const searchMatch = !q || (row.dataset.search || '').includes(q);
+        const show = tabMatch && searchMatch;
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      const cnt = document.getElementById('ln-list-count');
+      if (cnt) cnt.textContent = tab === 'all' && !q ? '全13件' : visible + '件';
+    }
+
+    // caseData は db_case.js で定義済み
+
+
+
+    /* ======== LN一覧 動的レンダリング（makeln進捗表示付き） ======== */
+    function renderLnList() {
+      const container = document.getElementById('ln-list-body');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      // localStorageから全LNのチェック状態を読み込み
+      const allLNChecklists = JSON.parse(localStorage.getItem('all_ln_checklists') || '{}');
+      
+      const lnKeys = Object.keys(caseData);
+      lnKeys.forEach(id => {
+        const d = caseData[id];
+        const ev = d.ev || {};
+        
+        // パーセンテージを先に計算
+        const kkPct = ev.kk ? Math.round(ev.kk.done / ev.kk.total * 100) : 0;
+        const plPct = ev.pl ? Math.round(ev.pl.done / ev.pl.total * 100) : 0;
+        
+        // lnmake.htmlからのチェック状態を反映
+        if (allLNChecklists[id]) {
+          ev.manual = {
+            inin: allLNChecklists[id].inin || false,
+            cert: allLNChecklists[id].cert || false,
+            box: allLNChecklists[id].box || false,
+            usb: allLNChecklists[id].usb || false
+          };
+          
+          // 準備完了度を再計算（手動チェック4項目 + 自動6項目 = 合計10項目）
+          const manualChecks = [ev.manual.inin, ev.manual.cert, ev.manual.box, ev.manual.usb];
+          const manualDone = manualChecks.filter(Boolean).length;
+          
+          // 自動チェック項目の完了数を計算
+          const autoDone = [
+            (kkPct === 100),  // 甲10完了
+            (plPct === 100),  // 甲11完了
+            true,             // IPN一覧（仮定）
+            true,             // 同一ファイル（仮定）
+            true,             // GoogleDrive連携（仮定）
+            allLNChecklists[id].appendix || false  // 別紙確認
+          ].filter(Boolean).length;
+          
+          ev.prep = {
+            done: manualDone + autoDone,
+            total: 10
+          };
+        } else if (!ev.manual) {
+          // チェック状態がない場合はデフォルト値を設定
+          ev.manual = {
+            inin: false,
+            cert: false,
+            box: false,
+            usb: false
+          };
+        }
+        
+        const prepPct = ev.prep ? Math.round(ev.prep.done / ev.prep.total * 100) : 0;
+        const docs = ev.docs || {};
+        const docIcons = (docs.honbun ? '✓' : '✗') + (docs.shomei ? '✓' : '✗') + ((docs.beshi||[]).every(Boolean) ? '✓' : '✗');
+        const docColor = (docs.honbun && docs.shomei && (docs.beshi||[]).every(Boolean)) ? '#15803d' : '#b45309';
+        const statusClass = d.status === 'すぐ作成可能' ? 'status-ready' : 'status-action';
+        const searchText = (id + ' ' + d.applicant + ' ' + d.opponent + ' ' + (d.product || '')).toLowerCase();
+        const dataStatus = d.status === 'すぐ作成可能' ? 'ready' : 'action';
+
+        // Card row
+        const row = document.createElement('div');
+        row.className = 'ln-card';
+        row.setAttribute('data-status', dataStatus);
+        row.setAttribute('data-search', searchText);
+
+        row.innerHTML = `
+          <div class="ln-card-head" onclick="toggleLnExpand('${id}', event)">
+            <div class="ln-card-left">
+              <span class="ln-card-num">${id}</span>
+              <span class="ln-card-parties">${d.applicant} / ${d.opponent}</span>
+            </div>
+            <div class="ln-card-right">
+              <span class="ln-card-ip">${d.ipCount || '-'}件</span>
+              <span class="ln-card-docs" style="color:${docColor}" title="本文/説明書/別紙">${docIcons}</span>
+              <span class="status-badge ${statusClass}">${d.status}</span>
+              <span class="ln-card-date">${d.date || ''}</span>
+              <span class="ln-card-arrow" id="expand-icon-${id}">▼</span>
+            </div>
+          </div>
+          <div class="ln-card-bars">
+            <div class="ln-bar-group">
+              <span class="ln-bar-label">甲10</span>
+              <span class="ln-bar-pct" style="background:${kkPct===100?'#d1fae5':'#fef3c7'};color:${kkPct===100?'#065f46':'#92400e'}">${kkPct}%</span>
+            </div>
+            <div class="ln-bar-group">
+              <span class="ln-bar-label">甲11</span>
+              <span class="ln-bar-pct" style="background:${plPct===100?'#d1fae5':'#dbeafe'};color:${plPct===100?'#065f46':'#1e40af'}">${plPct}%</span>
+            </div>
+            <div class="ln-bar-group">
+              <span class="ln-bar-label">準備</span>
+              <span class="ln-bar-pct" style="background:${prepPct===100?'#d1fae5':'#ede9fe'};color:${prepPct===100?'#065f46':'#5b21b6'}">${ev.prep?ev.prep.done+'/'+ev.prep.total:'-'}</span>
+            </div>
+          </div>
+          <div class="ln-expand-detail" id="expand-${id}" style="display:none">
+            <div class="ln-expand-grid">
+              <div>
+                <div class="ln-expand-item"><span class="ln-expand-label">申立種類</span><span class="ln-expand-val">${ev.appealType || '-'}</span></div>
+                <div class="ln-expand-item"><span class="ln-expand-label">著作権パターン</span><span class="ln-expand-val">${ev.pattern || '-'}</span></div>
+                <div class="ln-expand-item"><span class="ln-expand-label">lo処理</span><span class="ln-expand-val">${ev.lo?ev.lo.done+'/'+ev.lo.total+'件 ('+Math.round(ev.lo.done/ev.lo.total*100)+'%)':'-'}</span></div>
+              </div>
+              <div>
+                <div class="ln-expand-item"><span class="ln-expand-label">甲10 不足枝番</span><span class="ln-expand-val ev-missing">${(ev.kkMissing||[]).length>0?'欠: '+(ev.kkMissing||[]).join(', '):'✓ 完了'}</span></div>
+                <div class="ln-expand-item"><span class="ln-expand-label">甲11 不足枝番</span><span class="ln-expand-val ev-missing">${(ev.plMissing||[]).length>0?'欠: '+(ev.plMissing||[]).slice(0,8).join(', ')+(ev.plMissing.length>8?' 他'+(ev.plMissing.length-8)+'件':''):'✓ 完了'}</span></div>
+                <div class="ln-expand-item"><span class="ln-expand-label">手動チェック</span><span class="ln-expand-val">${ev.manual?('委任状 <span style="color:'+(ev.manual.inin?'#059669':'#dc2626')+'">'+(ev.manual.inin?'✓':'✗')+'</span> / 証明書 <span style="color:'+(ev.manual.cert?'#059669':'#dc2626')+'">'+(ev.manual.cert?'✓':'✗')+'</span> / Box <span style="color:'+(ev.manual.box?'#059669':'#dc2626')+'">'+(ev.manual.box?'✓':'✗')+'</span> / USB <span style="color:'+(ev.manual.usb?'#059669':'#dc2626')+'">'+(ev.manual.usb?'✓':'✗')+'</span>'):'-'}</span></div>
+              </div>
+            </div>
+            <div class="ln-expand-actions">
+              <a href="lnmake.html?ln=${id}" class="ln-open-makeln" onclick="event.stopPropagation()">📝 makelnで開く →<span class="element-id" title="要素ID: P-30">P-30</span></a>
+              ${d.driveFolderUrl ? `<a href="${d.driveFolderUrl}" class="ln-drive-link" target="_blank" onclick="event.stopPropagation()">📁 Drive: LNフォルダ<span class="element-id" title="要素ID: P-31">P-31</span></a>` : ''}
+              ${d.plDriveUrl ? `<a href="${d.plDriveUrl}" class="ln-drive-link" target="_blank" onclick="event.stopPropagation()">📁 Drive: plフォルダ<span class="element-id" title="要素ID: P-32">P-32</span></a>` : ''}
+              <button class="ln-db-files-btn" onclick="event.stopPropagation(); alert('DB格納ファイル閲覧機能は開発中です')" disabled title="将来実装: DB格納ファイル">🗄️ DBファイル（開発中）<span class="element-id" title="要素ID: P-33">P-33</span></button>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    var expandedLn = null;
+    function toggleLnExpand(id, event) {
+      if (event) event.preventDefault();
+      const el = document.getElementById('expand-' + id);
+      const icon = document.getElementById('expand-icon-' + id);
+      if (!el) return;
+      if (expandedLn && expandedLn !== id) {
+        const prev = document.getElementById('expand-' + expandedLn);
+        const prevIcon = document.getElementById('expand-icon-' + expandedLn);
+        if (prev) prev.style.display = 'none';
+        if (prevIcon) prevIcon.textContent = '▼';
+      }
+      if (el.style.display === 'none') {
+        el.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+        expandedLn = id;
+      } else {
+        el.style.display = 'none';
+        if (icon) icon.textContent = '▼';
+        expandedLn = null;
+      }
+    }
+
+    function setDetailCase(id) {
+      // panel-detail 削除済み — サイドバーのフィードバック更新のみ残す
+      const d = caseData[id];
+      if (!d) return;
+      currentDetailLn = id || '';
+      updateSidebarFeedback(id, d);
+    }
+
+    function updateSidebarFeedback(lnId, d) {
+      const el = document.getElementById('sidebar-feedback-content');
+      if (!el) return;
+      const feedback = d?.automationFeedback || [];
+      if (feedback.length > 0) {
+        el.textContent = '';
+        el.classList.remove('empty');
+        feedback.forEach((msg, i) => {
+          const p = document.createElement('div');
+          p.style.marginBottom = i < feedback.length - 1 ? '6px' : '0';
+          p.textContent = '・' + msg;
+          el.appendChild(p);
+        });
+      } else {
+        el.textContent = lnId ? '自動化済み。手動作業は委任状・代表者事項証明書・KK・書類ボックス詰めのみ。' : 'LNを選択すると、自動化できなかった項目がここに表示されます。';
+        el.classList.add('empty');
+      }
+    }
+
+    // TEMPLATES は db_case.js で定義済み
+
+
+    function showTemplate(key) {
+      const el = document.getElementById('template-preview');
+      if (!el) return;
+      if (!key || !TEMPLATES[key]) {
+        el.textContent = 'テンプレートを選択するとここに表示されます。●部分を編集して使用してください。';
+        el.style.color = 'var(--muted)';
+        return;
+      }
+      el.textContent = TEMPLATES[key];
+      el.style.color = 'var(--ink)';
+    }
+
+    function setDocType(type) {
+      const sel = document.getElementById('doc-type-select');
+      if (sel) sel.value = type;
+      const full = document.getElementById('full-doc-type');
+      if (full) full.value = type;
+      const desc = document.getElementById('doc-type-desc');
+      if (desc) {
+        const texts = {
+          open: '<strong>発信者情報開示命令書</strong> — 開示請求のみ。必要別紙: 当事者目録、著作物目録、動画目録、発信者情報目録（１）。',
+          delete: '<strong>発信者情報開示命令書兼消去禁止命令申立書</strong> — 上記に加え: 発信者情報の保有、第３ 消去禁止命令の申立て（アクセスログ保存期間徒過のおそれ）。',
+          provide: '<strong>発信者情報開示命令書兼提供命令申立書</strong> — 上記に加え: 主文目録、発信者情報目録（２）通信回線情報（IP・発信時刻・ポート）。'
+        };
+        desc.innerHTML = texts[type] || texts.open;
+      }
+      updateFullDocSample();
+    }
+
+    const KANTOKU = `５　申立人が著作権者であること
+　申立人は、本件著作物（甲１３）を最初に発意して企画し、本件著作物の制作費用全てを負担する等の責任を負う主体であった。
+よって、申立人は本件著作物の「映画製作者」（著作権法第２条第１０号）に当たる。
+　申立人は、「朱雀」及び「キリハマサムネ」こと申立外吉沢実に対して本件著作物の製作を依頼し、同人が監督を担当した。同人は、脚本の創作や映像の編集等の総指揮を行って、本件著作物の脚本や映像内容に関する最終決定権限を有しており、本件著作物に「全体的形成に創作的に寄与し」ており、著作者に当たる（著作権法第１６条）。
+　この点、本件著作物の制作にあたり、同人は、映画製作者である申立人に対し、本件著作物の制作に参加することを約束していたことから（甲１４）、本件著作物の著作権は申立人に帰属した（著作権法第２９条第１項）。
+　よって、申立人は、相手方に対し、情報流通プラットフォーム対処法第８条、第５条１項に基づき、別紙発信者情報目録記載の情報の開示を求める。`;
+
+    const MUKANTOKU = `　別紙著作物目録記載の動画（以下、「本件著作物」という。）を収録したＤＶＤのパッケージ（甲１３）の左下に、「製作・著作・受審 ●ＳＯＤクリエイト（株）」と申立人の商号が表示されていることから、申立人は著作者と推定される（著作権法第１４条）。この推定を覆す事実はない。
+　　　したがって、申立人は、本件著作物に対する著作権を有する（著作権法第１７条１項）。`;
+
+    const HOJYU = `４　発信者情報の保有
+相手方は、本件各発信者についての、別紙発信者情報目録記載の情報（氏名又は名称、住所、電話番号及び電子メールアドレスの情報）を保有している。
+なお、本件各通信においては、別紙動画目録における「IPアドレス（接続先）」欄において、本件調査会社側のＩＰアドレスも記載している。相手方におかれては保有確認を行う際に当該ＩＰアドレスの情報も加味した上で調査されたい。`;
+
+    const SHOKIN = `第３　消去禁止命令の申立て
+現段階では、相手方が別紙発信者情報目録記載の情報を任意に保存するか否かは明らかではなく、上記開示命令の発令を待っていては相手方におけるアクセスログの保存期間を徒過し、本件各発信者を特定することができなくなるおそれがある。
+よって、申立人は、情報流通プラットフォーム対処法第１６条１項に基づき、相手方に対する別紙発信者情報目録記載の情報の消去禁止命令を求める。`;
+
+    function updateFullDocSample() {
+      const el = document.getElementById('full-doc-sample');
+      if (!el) return;
+      const docType = document.getElementById('full-doc-type')?.value || 'open';
+      const proof = document.getElementById('copyright-proof')?.value || 'kantoku';
+      const kantoku = proof === 'kantoku';
+      const shokyi = docType === 'delete';
+      const teikyo = docType === 'provide';
+
+      let s = `令和　　年　　月　　　日
+東京地方裁判所民事部　御中
+申立人手続代理人弁護士　　戸　田　　　　泉
+　　当事者の表示　　別紙当事者目録記載のとおり
+
+申立ての趣旨
+１　発信者情報開示命令の申立て
+相手方は、申立人に対し、別紙発信者情報目録記載の情報を開示せよ
+との裁判を求める。
+`;
+      if (shokyi) {
+        s += `２　消去禁止命令の申立て
+　　相手方は、前項の申立てに係る発信者情報開示命令申立事件（当該申立てについての決定（当該申立てを不適法として却下する決定を除く。）に対して異議の訴えが提起されたときは、その訴訟）が終了するまでの間、別紙発信者情報目録記載の情報を消去してはならない
+　との裁判を求める。
+
+`;
+      }
+      s += `（理由）
+
+`;
+      if (shokyi) {
+        s += HOJYU + `
+
+`;
+      }
+      s += (kantoku ? KANTOKU : MUKANTOKU) + `
+
+`;
+      if (shokyi) {
+        s += SHOKIN + `
+
+`;
+      }
+      s += `附属書類
+１　証拠説明書　　　　　１通
+２　甲号各証　　　　　各１通
+３　資格証明書　　　　　２通
+４　手続代理委任状　　　　通　手書き
+
+（別紙）
+当　事　者　目　録
+
+〒１０１－００６５　東京都千代田区西神田三丁目３番９号
+申立人　株式会社マイロール
+　　　　　　　　　　上記代表者代表取締役　　　　小出　裕貴
+
+〒１０８－００２３　東京都港区芝浦４－１６－２３　アクアシティ芝浦９階
+　　　　　　　　　　弁護士法人ＩＴＪ法律事務所（送達場所）
+　　　　　　　　　　電話　　０５０（５８４６）７２５１
+　　　　　　　　　　ＦＡＸ　０３（５７３０）０２２６
+　　　　　　　　　　申立人手続代理人弁護士　　　戸田　泉
+　　　　　　　　　　同　　　　　　　弁護士　　　角地山　宗行
+　　　　　　　　　　同　　　　　　　弁護士　　　大塚　直
+　　　　　　　　　　同　　　　　　　弁護士　　　河田　隆克
+　　　　　　　　　　同　　　　　　　弁護士　　　清水　聡
+　　　　　　　　　　同　　　　　　　弁護士　　　畠山　晃
+
+〒１０５－７５２９　東京都港区海岸一丁目７番１号
+相手方　ソフトバンク株式会社
+　　　　　　　　　　上記代表者代表取締役　　　　宮川　潤一
+
+（別紙）
+著　作　物　目　録
+
+『プレミアム・シリーズ・スペシャル【原◯シニ◯ーラ(淑女)様】ガチ爆乳Ｋカップ108cm種付け孕ませ妊娠ザーメン生中出し完全着衣セックス【潮吹き/口内射精/放尿/膣内中出し射精/追撃放尿/追撃口内射精】』（SHC082）
+『コスプレイヤーの匂い【天海◯香編③ピンクダイアモンド】ガチ同人声優美少女ちゃん「あたしの生吐息を耳からブチ込まれて脳イキしろ」バイノーラル乳首責め【特典】ガチ実演本気オナ×甘トロ媚**ネバ汁エステSP』（SHC089）
+『着衣性交伝説【どすけべ国家フェラテーヌ】塩味（えんみ）の効いた大量イキ潮ハメ潮アクメ潮ぶち撒き３リットル低身長145cmクソ雑魚メスガキレイヤー生ハメ中出し孕ませ種付け子作りファック【原◯フリーナ】』（SHC093）
+（以下、著作物目録記載のとおり）
+
+`;
+      if (teikyo) {
+        s += `（別紙）
+主　文　目　録
+
+　相手方は、申立人に対し、別紙発信者情報目録（２）記載の情報のうち相手方が保有するものにより特定できる、別紙動画目録記載の情報に係る他の開示関係役務提供者（当該情報の発信者であると認められるものを除く。）の氏名又は名称及び住所を書面又は電磁的方法により提供せよ。
+
+　以上
+
+`;
+      }
+      s += `（別紙）
+発　信　者　情　報　目　録（１）
+
+別紙動画目録記載の各ＩＰアドレスを、同目録記載の各発信時刻頃に相手方から割り当てられていた契約者に関する以下の情報。
+　①　氏名又は名称
+　②　住所
+　③　電話番号
+　④　電子メールアドレス
+
+`;
+      if (teikyo) {
+        s += `（別紙）
+発　信　者　情　報　目　録（２）
+
+　別紙動画目録記載の各ＩＰアドレス（接続元）を同目録記載の各発信時刻に割り当てられた通信回線に係る以下の情報
+　ア　ＩＰアドレス（接続元）
+　イ　発信時刻
+　ウ　ポート番号（接続元）
+`;
+      }
+      el.textContent = s;
+    }
+
+    function updateSummaryCards() {
+      const rows = document.querySelectorAll('.ln-card');
+      let all = 0, ready = 0, action = 0, processing = 0;
+      rows.forEach(row => {
+        all++;
+        const s = row.dataset.status;
+        if (s === 'ready') ready++;
+        else if (s === 'action') action++;
+        else if (s === 'processing') processing++;
+      });
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      set('summary-all', all);
+      set('summary-ready', ready);
+      set('summary-processing', processing);
+      set('summary-action', action);
+      // タブの件数表示も更新
+      document.querySelectorAll('#panel-list .tab').forEach(t => {
+        const cnt = t.querySelector('.count');
+        if (!cnt) return;
+        const tab = t.dataset.tab;
+        if (tab === 'all') cnt.textContent = all + '件';
+        else if (tab === 'ready') cnt.textContent = ready + '件';
+        else if (tab === 'action') cnt.textContent = action + '件';
+        else if (tab === 'processing') cnt.textContent = processing + '件';
+      });
+    }
+
+    function filterLnList() {
+      const q = (document.getElementById('ln-search').value || '').toLowerCase().trim();
+      document.querySelectorAll('.ln-card').forEach(row => {
+        const match = !q || (row.dataset.search || '').includes(q);
+        const tabMatch = currentListTab === 'all' || row.dataset.status === currentListTab;
+        row.style.display = (match && tabMatch) ? '' : 'none';
+      });
+    }
+
+    document.getElementById('ln-search')?.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') filterLnList();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderLnList();
+      setUser('nobunaga');
+      setDocType('open');
+      updateFullDocSample();
+      renderFeedbackLog();
+      updateSummaryCards();
+      // box-checklist → lnmanual.html に移動済み
+    });
+    
+    // lnmake.htmlから戻ってきた時にLN一覧と書類把握を更新
+    window.addEventListener('focus', function() {
+      renderLnList();
+      if (currentListViewMode === 'status') {
+        updateLnStatusTable();
+      }
+      console.log('✓ ページフォーカス: LN一覧を更新しました');
+    });
+    
+    // localStorageの変更を検知して更新（同一ブラウザの別タブ）
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'all_ln_checklists' || e.key === 'ln_doc_statuses') {
+        renderLnList();
+        if (currentListViewMode === 'status') {
+          updateLnStatusTable();
+        }
+        console.log('✓ チェックリスト更新を検知: LN一覧と書類把握を更新しました');
+      }
+    });
+
+    document.getElementById('full-doc-type')?.addEventListener('change', function() {
+      setDocType(this.value);
+    });
+  </script>
+
+  <!-- ========== 作成依頼テキスト生成モーダル ========== -->
+  <div id="requestTextModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center" onclick="if(event.target.id==='requestTextModal')this.style.display='none'">
+    <div style="background:#fff;border-radius:16px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:24px 24px 16px;border-bottom:1px solid #e5e7eb">
+        <div style="font-size:18px;font-weight:700;color:#111827">📋 書類作成依頼テキスト</div>
+        <button onclick="document.getElementById('requestTextModal').style.display='none'" style="width:32px;height:32px;border-radius:8px;border:none;background:#f3f4f6;color:#6b7280;cursor:pointer;font-size:20px">×</button>
+      </div>
+      <div style="padding:24px">
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px">
+          <strong>💡 使い方：</strong> 不足している書類ごとにLN番号をまとめています。Google Chatやメールにコピーして送信してください。
+        </div>
+        <div style="position:relative">
+          <textarea id="requestTextContent" readonly style="width:100%;min-height:400px;padding:16px;border:1px solid #d1d5db;border-radius:8px;font-family:monospace;font-size:13px;line-height:1.8;resize:vertical;background:#f9fafb"></textarea>
+          <button onclick="copyRequestText()" style="position:absolute;top:12px;right:12px;padding:8px 16px;background:#059669;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,0.3)">
+            📋 コピー
+          </button>
+        </div>
+        <div id="requestTextCopyStatus" style="margin-top:12px;padding:12px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // 作成依頼テキストを生成
+  function generateRequestText() {
+    // localStorageから最新の状態を取得してLN_STATUS_DATAを更新
+    const savedStatuses = JSON.parse(localStorage.getItem('ln_doc_statuses') || '{}');
+    const allLNChecklists = JSON.parse(localStorage.getItem('all_ln_checklists') || '{}');
+    
+    LN_STATUS_DATA.forEach(r => {
+      if (savedStatuses[r.ln]) {
+        r.p = savedStatuses[r.ln].p !== undefined ? savedStatuses[r.ln].p : r.p;
+        r.kk = savedStatuses[r.ln].kk !== undefined ? savedStatuses[r.ln].kk : r.kk;
+        r.usb = savedStatuses[r.ln].usb !== undefined ? savedStatuses[r.ln].usb : r.usb;
+        r.cert = savedStatuses[r.ln].cert !== undefined ? savedStatuses[r.ln].cert : r.cert;
+      }
+      if (allLNChecklists[r.ln]) {
+        const lnCheck = allLNChecklists[r.ln];
+        if (lnCheck.inin !== undefined) r.p = lnCheck.inin;
+        if (lnCheck.cert !== undefined) r.cert = lnCheck.cert;
+        if (lnCheck.usb !== undefined) r.usb = lnCheck.usb;
+      }
+    });
+    
+    // 現在のLNデータを取得
+    const lnData = LN_STATUS_DATA;
+    
+    // 不足している書類ごとにLNを分類
+    const missing = {
+      p: [],      // 委任状
+      kk: [],     // KK
+      usb: [],    // 証拠用USB
+      cert: []    // 代表者事項証明書
+    };
+    
+    lnData.forEach(ln => {
+      if (!ln.p) missing.p.push(ln.ln);
+      if (!ln.kk) missing.kk.push(ln.ln);
+      if (!ln.usb) missing.usb.push(ln.ln);
+      if (!ln.cert) missing.cert.push(ln.ln);
+    });
+    
+    // テキストを生成
+    const totalMissing = missing.p.length + missing.kk.length + missing.usb.length + missing.cert.length;
+    
+    let text = '';
+    
+    if (totalMissing === 0) {
+      text = '🎉 【書類状況】\n\n';
+      text += '✅ すべての書類が揃っています！\n';
+      text += '申立書作成を進めることができます。\n\n';
+      text += '━━━━━━━━━━━━━━━━━━━━\n';
+      text += '※ 生成日時: ' + new Date().toLocaleString('ja-JP');
+    } else {
+      text = '📋 【書類作成依頼】\n\n';
+      text += '以下のLNで書類が不足しています。\n';
+      text += 'ご確認・ご手配をお願いします。\n\n';
+      text += '━━━━━━━━━━━━━━━━━━━━\n\n';
+      
+      if (missing.p.length > 0) {
+        text += '🔴 委任状が不足しているLN（' + missing.p.length + '件）\n';
+        text += '   ' + missing.p.join(', ') + '\n\n';
+      }
+      
+      if (missing.kk.length > 0) {
+        text += '🟡 KK（DB記録印刷書面）が不足しているLN（' + missing.kk.length + '件）\n';
+        text += '   ' + missing.kk.join(', ') + '\n\n';
+      }
+      
+      if (missing.usb.length > 0) {
+        text += '🟠 証拠用USBが不足しているLN（' + missing.usb.length + '件）\n';
+        text += '   ' + missing.usb.join(', ') + '\n\n';
+      }
+      
+      if (missing.cert.length > 0) {
+        text += '🔵 代表者事項証明書が不足しているLN（' + missing.cert.length + '件）\n';
+        text += '   ' + missing.cert.join(', ') + '\n\n';
+      }
+      
+      text += '━━━━━━━━━━━━━━━━━━━━\n';
+      text += '📊 不足件数合計: ' + totalMissing + '件\n';
+      text += '📅 生成日時: ' + new Date().toLocaleString('ja-JP') + '\n';
+      text += '💻 システム: 申立書作成ポータル > 書類把握';
+    }
+    
+    // モーダルに表示
+    document.getElementById('requestTextContent').value = text;
+    document.getElementById('requestTextModal').style.display = 'flex';
+    document.getElementById('requestTextCopyStatus').style.display = 'none';
+  }
+  
+  // テキストをコピー
+  function copyRequestText() {
+    const textarea = document.getElementById('requestTextContent');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // モバイル対応
+    
+    // Clipboard APIを使用（モダンブラウザ）
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        showCopySuccess();
+      }).catch(() => {
+        // フォールバック
+        document.execCommand('copy');
+        showCopySuccess();
+      });
+    } else {
+      // 古いブラウザ用フォールバック
+      document.execCommand('copy');
+      showCopySuccess();
+    }
+  }
+  
+  function showCopySuccess() {
+    const status = document.getElementById('requestTextCopyStatus');
+    status.textContent = '✓ コピーしました！Google Chatに貼り付けてください';
+    status.style.background = '#d1fae5';
+    status.style.color = '#065f46';
+    status.style.display = 'block';
+    
+    setTimeout(() => {
+      status.style.display = 'none';
+    }, 3000);
+  }
+  
+  // ESCキーでモーダルを閉じる
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('requestTextModal');
+      if (modal && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+      }
+    }
+  });
+  </script>
+
+  <!-- ========== フィードバック機能 ========== -->
+  <style>
+  /* フィードバックボタン（固定） */
+  .feedback-float-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    transition: all 0.3s ease;
+  }
+  .feedback-float-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+  }
+  .feedback-float-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* フィードバックモーダル */
+  .feedback-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  .feedback-modal-overlay.active {
+    display: flex;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .feedback-modal-box {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .feedback-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .feedback-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feedback-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .feedback-modal-close:hover {
+    background: #e5e7eb;
+    color: #374151;
+  }
+  .feedback-modal-body {
+    padding: 24px;
+  }
+  .feedback-form-group {
+    margin-bottom: 20px;
+  }
+  .feedback-form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+  }
+  .feedback-form-select,
+  .feedback-form-input,
+  .feedback-form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .feedback-form-select:focus,
+  .feedback-form-input:focus,
+  .feedback-form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  .feedback-form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+  .feedback-form-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .feedback-form-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  .feedback-form-submit:active {
+    transform: translateY(0);
+  }
+  .feedback-status {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .feedback-status.success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .feedback-status.error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  </style>
+
+  <!-- フィードバックボタン（固定） -->
+  <button class="feedback-float-btn" onclick="openFeedbackModal()" title="フィードバックを送信: P-99">
+    <span style="font-size:24px">💬</span>
+    <span class="element-id" style="position:absolute;bottom:2px;right:2px;font-size:7px;padding:1px 3px;background:#fff;color:#3b82f6" title="要素ID: P-99">P-99</span>
+  </button>
+
+  <!-- フィードバックモーダル -->
+  <div id="feedbackModalOverlay" class="feedback-modal-overlay" onclick="closeFeedbackModalOnOverlay(event)">
+    <div class="feedback-modal-box">
+      <div class="feedback-modal-header">
+        <div class="feedback-modal-title">
+          💬 フィードバックを送信
+        </div>
+        <button class="feedback-modal-close" onclick="closeFeedbackModal()">×</button>
+      </div>
+      <div class="feedback-modal-body">
+        <form id="feedbackForm" onsubmit="submitFeedback(event)">
+          <div class="feedback-form-group">
+            <label class="feedback-form-label">フィードバックの種類</label>
+            <select id="feedbackType" class="feedback-form-select" required>
+              <option value="">選択してください</option>
+              <option value="bug">🐛 バグ・不具合</option>
+              <option value="improvement">💡 改善提案</option>
+              <option value="question">❓ 質問・わからないこと</option>
+              <option value="other">📝 その他</option>
+            </select>
+          </div>
+          
+          <div class="feedback-form-group">
+            <label class="feedback-form-label">ページ・機能名（任意）</label>
+            <input type="text" id="feedbackLocation" class="feedback-form-input" 
+              placeholder="例: LN一覧、申立書作成、書類チェックリスト">
+          </div>
+          
+          <div class="feedback-form-group">
+            <label class="feedback-form-label">詳細な内容 <span style="color:#ef4444">*</span></label>
+            <textarea id="feedbackContent" class="feedback-form-textarea" required
+              placeholder="例: 
+• 書類チェックリストで委任状にチェックを入れても保存されない
+• 申立書プレビューの文字が小さくて読みにくい
+• 証拠説明書の自動生成機能がほしい
+• この画面の使い方がわからない"></textarea>
+          </div>
+          
+          <div class="feedback-form-group">
+            <label class="feedback-form-label">あなたのお名前（任意）</label>
+            <input type="text" id="feedbackName" class="feedback-form-input" 
+              placeholder="例: 織田信長">
+          </div>
+          
+          <button type="submit" class="feedback-form-submit">
+            📤 送信する
+          </button>
+          
+          <div id="feedbackStatus" class="feedback-status" style="display:none"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // フィードバック機能のJavaScript
+  (function() {
+    // ページ情報を自動取得
+    function getPageInfo() {
+      return {
+        url: window.location.href,
+        pathname: window.location.pathname,
+        pageTitle: document.title,
+        userAgent: navigator.userAgent,
+        screenSize: window.screen.width + 'x' + window.screen.height,
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    // モーダルを開く
+    window.openFeedbackModal = function() {
+      const modal = document.getElementById('feedbackModalOverlay');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('feedbackForm').reset();
+        document.getElementById('feedbackStatus').style.display = 'none';
+        
+        const pageName = document.title.split('—')[0].trim();
+        document.getElementById('feedbackLocation').value = pageName;
+        
+        const savedName = localStorage.getItem('feedback_user_name');
+        if (savedName) {
+          document.getElementById('feedbackName').value = savedName;
+        }
+      }
+    };
+
+    // モーダルを閉じる
+    window.closeFeedbackModal = function() {
+      const modal = document.getElementById('feedbackModalOverlay');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    };
+
+    // オーバーレイクリックで閉じる
+    window.closeFeedbackModalOnOverlay = function(event) {
+      if (event.target.id === 'feedbackModalOverlay') {
+        closeFeedbackModal();
+      }
+    };
+
+    // フィードバックを送信
+    window.submitFeedback = function(event) {
+      event.preventDefault();
+      
+      const type = document.getElementById('feedbackType').value;
+      const location = document.getElementById('feedbackLocation').value;
+      const content = document.getElementById('feedbackContent').value.trim();
+      const name = document.getElementById('feedbackName').value.trim();
+      
+      if (!content) {
+        showFeedbackStatus('詳細な内容を入力してください', 'error');
+        return;
+      }
+      
+      const feedback = {
+        id: 'fb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        type: type,
+        location: location || document.title,
+        content: content,
+        name: name || '匿名',
+        pageInfo: getPageInfo(),
+        timestamp: new Date().toISOString(),
+        status: 'new'
+      };
+      
+      const feedbacks = JSON.parse(localStorage.getItem('system_feedbacks') || '[]');
+      feedbacks.push(feedback);
+      localStorage.setItem('system_feedbacks', JSON.stringify(feedbacks));
+      
+      if (name) {
+        localStorage.setItem('feedback_user_name', name);
+      }
+      
+      showFeedbackStatus('✓ フィードバックを送信しました！ご協力ありがとうございます。', 'success');
+      
+      setTimeout(() => {
+        closeFeedbackModal();
+      }, 2000);
+      
+      console.log('フィードバック送信:', feedback);
+    };
+
+    // ステータス表示
+    function showFeedbackStatus(message, type) {
+      const status = document.getElementById('feedbackStatus');
+      if (status) {
+        status.textContent = message;
+        status.className = 'feedback-status ' + type;
+        status.style.display = 'block';
+      }
+    }
+
+    // ESCキーでモーダルを閉じる
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeFeedbackModal();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

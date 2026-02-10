@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>業務マニュアル — LNポータル</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#f4f5f8;color:#1e293b;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:#2563eb;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Header */
+.hd{background:linear-gradient(135deg,#1e3a5f,#2d5186);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hd-left{display:flex;align-items:center;gap:10px}
+.hd h1{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.hd-sub{font-size:10px;color:rgba(255,255,255,.55);font-weight:500}
+.hd a{color:rgba(255,255,255,.7);font-size:12px;font-weight:600}
+.hd a:hover{color:#fff;text-decoration:none}
+
+/* Layout */
+.wrap{max-width:800px;margin:0 auto;padding:24px 16px 40px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;padding:5px;background:#e2e6ee;border-radius:10px}
+.tabs button{font:inherit;font-size:11px;font-weight:600;padding:7px 13px;border:none;border-radius:7px;cursor:pointer;background:transparent;color:#64748b;transition:all .2s}
+.tabs button:hover{background:rgba(255,255,255,.5);color:#334155}
+.tabs button.on{background:#fff;color:#1e3a5f;box-shadow:0 1px 4px rgba(0,0,0,.1);border-bottom:2px solid #2563eb}
+
+/* Section group */
+.grp{margin-bottom:24px}
+.grp-title{font-size:14px;font-weight:700;padding:0 2px 8px;margin-bottom:10px;border-bottom:2px solid #e2e4ea;color:#1e293b}
+
+/* Card = native details */
+.c{border:1px solid #e2e4ea;border-radius:10px;margin-bottom:8px;background:#fff;overflow:hidden}
+.c summary{padding:12px 16px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;transition:background .15s}
+.c summary::-webkit-details-marker{display:none}
+.c summary::after{content:"▼";font-size:9px;color:#94a3b8;flex-shrink:0;transition:transform .2s}
+.c[open] summary::after{transform:rotate(180deg)}
+.c summary:hover{background:#f8fafc}
+.c .bd{padding:14px 16px;border-top:1px solid #f1f3f5;font-size:12px;line-height:1.85;color:#334155}
+
+/* Badges */
+.bg{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.bg-all{background:#f1f5f9;color:#64748b}
+.bg-beg{background:#ecfdf5;color:#059669}
+.bg-exp{background:#eff6ff;color:#2563eb}
+.bg-ldr{background:#f5f3ff;color:#7e3af2}
+
+/* Content helpers */
+.bd ol,.bd ul{margin:8px 0 0 18px}
+.bd ol li,.bd ul li{margin-bottom:2px}
+.grid{display:grid;gap:10px;margin:12px 0}
+.grid-2{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.chip{border-radius:8px;padding:10px 12px;font-size:11px}
+.note{font-size:11px;color:#64748b;margin-top:10px}
+
+/* Role cards */
+.rc{border-radius:10px;padding:14px 16px;margin:10px 0}
+.rc-beg{background:#ecfdf5;border:1px solid #86efac}
+.rc-exp{background:#eff6ff;border:1px solid #bfdbfe}
+.rc-ldr{background:#f5f3ff;border:1px solid #c4b5fd}
+.rc h4{font-size:13px;margin-bottom:8px}
+
+/* Screen cards */
+.sc{border-radius:8px;padding:10px 12px;font-size:11px}
+.sc strong{font-size:13px;display:block;margin-bottom:4px}
+.sc div{margin-top:4px}
+
+/* Flow chart */
+.flow{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap;margin:12px 0;font-size:12px}
+.flow-step{flex:1;min-width:110px;background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;padding:10px;text-align:center}
+.flow-step strong{display:block;font-weight:700;margin-bottom:3px}
+.flow-step small{font-size:10px;color:#64748b}
+.flow-step.hl{background:#ecfdf5;border-color:#86efac}
+.flow-step.hl2{background:#f5f3ff;border-color:#c4b5fd}
+.flow-arr{display:flex;align-items:center;color:#94a3b8;font-size:14px;flex-shrink:0}
+@media(max-width:600px){
+  .flow{flex-direction:column;align-items:center}
+  .flow-arr{transform:rotate(90deg)}
+  .flow-step{min-width:0;width:100%;max-width:260px}
+}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:10px}
+.tbl th,.tbl td{padding:6px 8px;border:1px solid #e2e4ea;text-align:left}
+.tbl th{background:#f1f5f9;font-weight:700}
+.tbl tr.warn-row{background:#fffbeb}
+.tbl .st-ok{color:#059669}
+.tbl .st-wait{color:#d97706}
+.tbl .ln-id{font-weight:600}
+
+/* Box checklist */
+.ck{list-style:none}
+.ck li{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:6px;background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;transition:background .2s;font-size:12px}
+.ck li.ok{background:#ecfdf5;border-color:#86efac}
+.ck input[type=checkbox]{width:18px;height:18px;accent-color:#059669;cursor:pointer;flex-shrink:0}
+.ck .dn{font-weight:600}
+.ck .nt{font-size:10px;color:#64748b;margin-top:1px}
+.btn{font:inherit;font-size:12px;font-weight:600;padding:7px 14px;border:1px solid #d1d5db;border-radius:8px;background:#f9fafb;cursor:pointer}
+.btn:hover{background:#e5e7eb}
+
+/* Doc grid */
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin:14px 0}
+.dg div{text-align:center;background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;padding:12px 8px;font-size:10px;font-weight:600}
+.dg div span{display:block;font-size:22px;margin-bottom:4px}
+
+/* Warn box */
+.warn{background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;padding:12px 16px;font-size:12px;margin-top:14px}
+.warn strong{color:#b45309}
+.warn ul{margin:6px 0 0 16px}
+
+/* Footer */
+.ft{margin-top:32px;padding:20px 0;border-top:2px solid #e2e4ea;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.ft a{display:block;background:#fff;border:1px solid #e2e4ea;border-radius:10px;padding:14px 16px;text-decoration:none;transition:border-color .2s,box-shadow .2s}
+.ft a:hover{border-color:#bfdbfe;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ft a strong{display:block;font-size:13px;color:#1e293b;margin-bottom:2px}
+.ft a small{font-size:10px;color:#64748b}
+
+/* Dark code block */
+.code-tree{background:#1e293b;border-radius:8px;padding:14px;font-size:11px;color:#e2e8f0;font-family:monospace;line-height:1.8}
+
+/* Manual numbering */
+.manual-num{display:inline-block;font-weight:700;color:#2563eb;margin-right:6px;font-family:monospace}
+.section-num{font-size:14px;font-weight:800;color:#2563eb;margin-right:8px}
+
+/* Feedback button */
+.feedback-btn{float:right;font-size:10px;padding:4px 10px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-weight:600;color:#6b7280;transition:all 0.2s}
+.feedback-btn:hover{background:#e5e7eb;color:#374151;transform:translateY(-1px)}
+
+/* Feedback modal */
+.feedback-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center}
+.feedback-modal.active{display:flex}
+.feedback-modal-content{background:#fff;border-radius:12px;max-width:500px;width:90%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.feedback-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.feedback-modal-title{font-size:16px;font-weight:700}
+.feedback-close{cursor:pointer;font-size:20px;color:#9ca3af}
+.feedback-close:hover{color:#374151}
+.feedback-textarea{width:100%;min-height:120px;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px}
+.feedback-submit{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+.feedback-submit:hover{background:#1e40af}
+
+/* 要素番号バッジ */
+.element-id {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #9ca3af;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  cursor: help;
+  transition: all 0.2s;
+}
+.element-id:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  transform: scale(1.1);
+}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-left">
+    <h1>業務マニュアル</h1>
+    <span class="hd-sub">わからないことがあればいつでもここへ</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button onclick="showFeedbackList()" style="background:#f3f4f6;border:1px solid #d1d5db;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#374151">
+      📋 フィードバック一覧 <span id="feedbackCount" style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;margin-left:4px">0</span><span class="element-id" title="要素ID: MAN-01">MAN-01</span>
+    </button>
+    <a href="lnportal.html">← ポータルに戻る<span class="element-id" title="要素ID: MAN-02">MAN-02</span></a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs" id="tabs">
+    <button class="on" data-t="all">すべて</button>
+    <button data-t="intro">はじめに</button>
+    <button data-t="evidence">証拠の集め方</button>
+    <button data-t="ln-check">LN確認</button>
+    <button data-t="box">書類詰め</button>
+    <button data-t="expert">expert業務</button>
+    <button data-t="game">実績</button>
+    <button data-t="leader">leader</button>
+  </div>
+
+  <!-- ========== はじめに ========== -->
+  <div class="grp" data-g="intro">
+    <h2 class="grp-title"><span class="section-num">1.</span>はじめに — このシステムの使い方</h2>
+
+    <details class="c" id="sec-1-1" open><summary><span class="manual-num">1.1</span>このシステムって何？<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.1','このシステムって何？')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>このシステムは<strong>「発信者情報開示請求」の書類作成を管理するツール</strong>です。</p>
+      <p style="margin-top:8px">やることをひと言でいうと —</p>
+      <div style="background:#eff6ff;border-radius:8px;padding:12px 16px;margin:10px 0;font-size:13px;font-weight:600;color:#1e40af">
+        「違法アップロードした人の情報を、プロバイダ（通信会社）に教えてもらうための裁判所への申し立て」を準備する
+      </div>
+      <p>著作権を持つ会社（申立人）の代理として、弁護士がプロバイダに開示請求をします。その書類作成・証拠集め・提出管理をこのシステムで行います。</p>
+      <p class="note">難しそうに聞こえますが、手順は決まっているので、マニュアル通りにやれば大丈夫です。</p>
+    </div></details>
+
+    <details class="c" id="sec-1-2"><summary><span class="manual-num">1.2</span>4つの画面を知ろう<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.2','4つの画面を知ろう')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>システムは<strong>4つの画面</strong>でできています。ブラウザで開くだけで使えます。</p>
+      <div class="grid grid-2" style="margin-top:12px">
+        <div class="sc" style="background:#eff6ff;border:1px solid #bfdbfe">
+          <strong style="color:#2563eb">① ポータル</strong>
+          <div><strong>何ができる？</strong> LN（事件）の一覧を見る、今日やることを確認する</div>
+          <div><strong>いつ使う？</strong> 朝一番にまず開く</div>
+          <div style="margin-top:6px"><a href="lnportal.html">→ lnportal.html</a></div>
+        </div>
+        <div class="sc" style="background:#ecfdf5;border:1px solid #86efac">
+          <strong style="color:#059669">② 書類作成（makeln）</strong>
+          <div><strong>何ができる？</strong> 申立書の作成、証拠チェック、Word出力</div>
+          <div><strong>いつ使う？</strong> 担当LNの書類を作るとき</div>
+          <div style="margin-top:6px"><a href="lnmake.html">→ lnmake.html</a></div>
+        </div>
+        <div class="sc" style="background:#f5f3ff;border:1px solid #c4b5fd">
+          <strong style="color:#7e3af2">③ マニュアル（いまここ）</strong>
+          <div><strong>何ができる？</strong> 用語・手順・チェックリストを確認</div>
+          <div><strong>いつ使う？</strong> やり方がわからないとき</div>
+        </div>
+        <div class="sc" style="background:#fff7ed;border:1px solid #fdba74">
+          <strong style="color:#ea580c">④ 実績・レベル（game）</strong>
+          <div><strong>何ができる？</strong> 自分のレベル・ポイント・チーム状況</div>
+          <div><strong>いつ使う？</strong> 成長の確認、日次レポート</div>
+          <div style="margin-top:6px"><a href="lngame.html">→ lngame.html</a></div>
+        </div>
+      </div>
+      <p class="note">各画面は独立しているので、どれかが壊れても他は影響を受けません。</p>
+    </div></details>
+
+    <details class="c" id="sec-1-3"><summary><span class="manual-num">1.3</span>ロール別クイックスタート<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.3','ロール別クイックスタート')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>あなたの<strong>ロール（役割）</strong>によって、やることが違います。ポータル右上のユーザー切替で確認できます。</p>
+      <div class="rc rc-beg">
+        <h4 style="color:#059669">beginner — まずはここから</h4>
+        <ol>
+          <li><strong>ポータル</strong>を開く → ホーム画面のステップナビに従う</li>
+          <li>「LN一覧」で<strong>今日やること（Ready）</strong>のLNを確認</li>
+          <li>LNをクリック → CSVダウンロードできるか、Driveにファイルがあるか確認</li>
+          <li>問題なければ<strong>「確認完了」</strong>ボタンで報告。不安なら先輩に聞く</li>
+        </ol>
+        <p style="margin-top:8px;font-size:11px;color:#059669"><strong>一日の目安:</strong> LN確認 3〜5件 + 書類ボックス詰め</p>
+      </div>
+      <div class="rc rc-exp">
+        <h4 style="color:#2563eb">expert — 書類作成のメイン担当</h4>
+        <ol>
+          <li><strong>ポータル</strong>でLN一覧を確認 → 「すぐ作成可能」なLNを選ぶ</li>
+          <li><strong>makeln</strong>で開く → 「証拠を集める」タブで証拠チェック</li>
+          <li>「書類作成」タブでテンプレ選択 → プレビュー → Word出力</li>
+          <li>弁護士にチェック依頼 → USB作成 → 提出準備</li>
+        </ol>
+        <p style="margin-top:8px;font-size:11px;color:#2563eb"><strong>一日の目安:</strong> 申立書作成 2〜4件 + 証拠確認 + beginnerサポート</p>
+      </div>
+      <div class="rc rc-ldr">
+        <h4 style="color:#7e3af2">leader — チーム管理＋実務</h4>
+        <ol>
+          <li><strong>ポータル</strong>のLN一覧 →「ステータスビュー」で全体の進捗確認</li>
+          <li><strong>実績ページ</strong>の日次レポートでメンバーの稼働チェック</li>
+          <li>委任状・証明書が揃ったLNから優先的に申立書作成を指示</li>
+          <li>例外案件の判断、beginnerの指導</li>
+        </ol>
+        <p style="margin-top:8px;font-size:11px;color:#7e3af2"><strong>ポイント:</strong> 委任状とKKが揃ったLNから着手するのが効率的</p>
+      </div>
+    </div></details>
+
+    <details class="c" id="sec-1-4"><summary><span class="manual-num">1.4</span>1つのLN（事件）ができるまで<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.4','1つのLN（事件）ができるまで')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>LNは事件番号のこと。例: <strong>7K14488</strong>。1つのLNが完了するまでの流れ:</p>
+      <div class="flow">
+        <div class="flow-step"><strong style="color:#2563eb">① 登録</strong><small>expertが新規LN登録</small></div>
+        <div class="flow-arr">→</div>
+        <div class="flow-step"><strong style="color:#2563eb">② lo取得</strong><small>プロバイダからPDF取得</small></div>
+        <div class="flow-arr">→</div>
+        <div class="flow-step"><strong style="color:#2563eb">③ pl作成</strong><small>証拠PDFまとめ（自動）</small></div>
+        <div class="flow-arr">→</div>
+        <div class="flow-step hl"><strong style="color:#059669">④ 準備確認</strong><small>beginnerがCSV/Drive確認</small></div>
+        <div class="flow-arr">→</div>
+        <div class="flow-step"><strong style="color:#2563eb">⑤ 申立書作成</strong><small>expertがWord出力</small></div>
+        <div class="flow-arr">→</div>
+        <div class="flow-step hl2"><strong style="color:#7e3af2">⑥ 提出</strong><small>leader/expertが裁判所へ</small></div>
+      </div>
+      <p class="note">beginnerさんは④がメイン。expertは②③⑤。leaderは⑥と全体管理。</p>
+    </div></details>
+
+    <details class="c" id="sec-1-5"><summary><span class="manual-num">1.5</span>用語・略号一覧<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.5','用語・略号一覧')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>この業務でよく使う言葉を、やさしく説明します。</p>
+      <div class="grid grid-2">
+        <div><strong>LN</strong> — ひとつの事件につき1つ。例：7K14488。仕事の基本単位</div>
+        <div><strong>訴番</strong> — LNと同じ意味。事件番号のこと</div>
+        <div><strong>委任状</strong> — 「弁護士さんに任せます」という書類。申立人から弁護士へ</div>
+        <div><strong>pl</strong> — 甲号証PDF。証拠説明書の甲１〜甲１３を1つのPDFにまとめたもの</div>
+        <div><strong>KK</strong> — パソコン画面を印刷した書面（DB記録印刷書面）</div>
+        <div><strong>lo</strong> — プロバイダから届いた開示結果のPDF</div>
+        <div><strong>CP（申立人）</strong> — 著作権を持っている会社。ナチュ、CONT等</div>
+        <div><strong>IPN</strong> — どの動画を・いつ・誰が、の一覧データ</div>
+        <div><strong>LNS</strong> — LNの中での通し番号。甲号証に使う</div>
+        <div><strong>証拠用USB</strong> — 証拠のPDFを入れたUSB。裁判所に提出</div>
+        <div><strong>申立人</strong> — 私たちの依頼主。情報開示を求める会社</div>
+        <div><strong>相手方</strong> — プロバイダ（KDDI、ソフトバンク等）</div>
+        <div><strong>申立書</strong> — 裁判所に情報開示をお願いする書類</div>
+        <div><strong>甲号証</strong> — 証拠の1つ1つ。甲１・甲２…と呼ぶ</div>
+        <div><strong>証拠説明書</strong> — 甲１〜甲１３を一覧にした書類</div>
+        <div><strong>別紙</strong> — 申立書に添える一覧表</div>
+      </div>
+      <p class="note">わからないことがあれば、周りの先輩やexpertに気軽に聞いてくださいね。</p>
+    </div></details>
+
+    <details class="c" id="sec-1-6"><summary><span class="manual-num">1.6</span>ポータル画面の操作ガイド<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.6','ポータル画面の操作ガイド')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>ポータル（lnportal.html）</strong>の使い方です。</p>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">画面上部</h4>
+      <ul>
+        <li><strong>右上のユーザーアイコン</strong> → クリックでユーザー切替（8人登録済み）。ロール別に見え方が変わります</li>
+        <li><strong>サイドバー</strong> → ホーム / LN一覧 / マニュアル / 実績 / フィードバック</li>
+      </ul>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">LN一覧の見方</h4>
+      <ul>
+        <li>各LNは<strong>カード形式</strong>で表示。LN番号・申立人・相手方・ステータスが一目でわかる</li>
+        <li>カードをクリック → 展開して詳細（進捗バー・証拠状況）が見える</li>
+        <li><strong>「makelnで開く」</strong>ボタンで書類作成画面にジャンプ</li>
+        <li>タブで絞り込み: すべて / 今日やること / 要対応 / pl処理中</li>
+        <li>検索ボックスで LN番号・申立人名・相手方名で検索</li>
+      </ul>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">ステータスの意味</h4>
+      <div class="grid grid-2" style="font-size:11px">
+        <div class="chip" style="background:#ecfdf5"><strong style="color:#059669">すぐ作成可能</strong> — 書類が揃ってすぐ作れる</div>
+        <div class="chip" style="background:#fffbeb"><strong style="color:#d97706">委任状待ち</strong> — 申立人からの委任状が未着</div>
+        <div class="chip" style="background:#fffbeb"><strong style="color:#d97706">代表者事項証明書待ち</strong> — 法務局から届くのを待っている</div>
+        <div class="chip" style="background:#eff6ff"><strong style="color:#2563eb">pl処理中</strong> — 証拠PDFの生成が進行中</div>
+      </div>
+    </div></details>
+
+    <details class="c" id="sec-1-7"><summary><span class="manual-num">1.7</span>書類作成画面（makeln）の操作ガイド<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.7','書類作成画面（makeln）の操作ガイド')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>makeln（lnmake.html）</strong>は書類を作る画面です。URLのパラメータでLNを指定します。</p>
+      <p style="margin:8px 0;font-size:11px;background:#f8fafc;padding:8px 12px;border-radius:6px;font-family:monospace">例: lnmake.html<strong>?ln=7K14488</strong></p>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">画面上部: 案件情報</h4>
+      <ul>
+        <li>LN番号・申立人・相手方・弁護士名・IP件数が表示される</li>
+        <li>Driveフォルダへのリンクもここにある</li>
+      </ul>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">3つのタブ</h4>
+      <div class="grid grid-3" style="font-size:11px">
+        <div class="chip" style="background:#eff6ff"><strong>書類作成</strong><br>テンプレ選択→プレビュー→Word出力</div>
+        <div class="chip" style="background:#ecfdf5"><strong>証拠を集める</strong><br>KK/PL/準備の進捗確認・チェック</div>
+        <div class="chip" style="background:#fff7ed"><strong>ステータス</strong><br>書類の揃い状況を一覧表示</div>
+      </div>
+      <h4 style="margin:12px 0 6px;font-size:12px;font-weight:700">「証拠を集める」タブの見方</h4>
+      <ul>
+        <li><strong>ダッシュボード</strong> — 全体の進捗（甲10・甲11・手動チェック）がリングで表示</li>
+        <li><strong>やることリスト</strong> — 未完了の項目が「要対応」に、完了済みが折りたたまれて表示</li>
+        <li><strong>CWグループ</strong> — IPNごとに証拠の詳細を確認。不足があれば赤で表示</li>
+      </ul>
+    </div></details>
+
+    <details class="c" id="sec-1-8"><summary><span class="manual-num">1.8</span>データベースの仕組み<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.8','データベースの仕組み')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>このシステムのデータは<strong>2つのJSファイル</strong>に入っています。サーバー不要で、ブラウザだけで動きます。</p>
+      <h4 style="margin:14px 0 6px;font-size:12px;font-weight:700;color:#2563eb">db_case.js — メインデータ</h4>
+      <div style="background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;padding:12px;font-size:11px;margin-bottom:10px">
+        <div class="grid grid-2" style="margin:0;gap:6px">
+          <div><strong>USERS</strong> — ユーザー8名（id, name, role）</div>
+          <div><strong>actionLog</strong> — 誰がいつ何をしたかの作業記録</div>
+          <div><strong>caseData</strong> — LN13件の詳細（証拠進捗 ev 等）</div>
+          <div><strong>LN_STATUS_DATA</strong> — 書類の揃い状況チェック</div>
+          <div><strong>TEMPLATES</strong> — 著作権証明テンプレート24種以上</div>
+        </div>
+      </div>
+      <h4 style="margin:14px 0 6px;font-size:12px;font-weight:700;color:#ea580c">db_game.js — ゲーム/労務管理データ</h4>
+      <div style="background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;padding:12px;font-size:11px;margin-bottom:10px">
+        <div class="grid grid-2" style="margin:0;gap:6px">
+          <div><strong>LEVEL_TABLE</strong> — Lv.1〜8の必要ポイント</div>
+          <div><strong>USER_GAME_DATA</strong> — 各ユーザーのレベル・累計pt</div>
+          <div><strong>PROMOTION_DATA</strong> — 昇格条件</div>
+          <div><strong>POINT_TABLE</strong> — 14種のポイント定義</div>
+        </div>
+      </div>
+      <h4 style="margin:14px 0 6px;font-size:12px;font-weight:700">LNデータ（caseData）の構造</h4>
+      <div style="background:#f8fafc;border:1px solid #e2e4ea;border-radius:8px;padding:12px;font-size:11px;margin:8px 0;line-height:1.9">
+        <strong>基本情報:</strong> applicant、opponent、status、lawyer、ipCount、date<br>
+        <strong>リンク:</strong> driveFolderUrl、plDriveUrl<br>
+        <strong>自動処理:</strong> automationFeedback（処理状況メッセージ配列）<br>
+        <strong>証拠進捗 ev:</strong> kk/pl/lo の done/total、kkMissing/plMissing、docs、manual
+      </div>
+      <h4 style="margin:14px 0 6px;font-size:12px;font-weight:700">ファイル構成</h4>
+      <div class="code-tree">
+        lnmake/<br>
+        ├─ <span style="color:#93c5fd">db_case.js</span> ← メインDB（LN・ユーザー・テンプレ）<br>
+        ├─ <span style="color:#fdba74">db_game.js</span> ← ゲームDB（レベル・ポイント）<br>
+        ├─ <span style="color:#86efac">lnportal.html</span> ← ポータル画面<br>
+        ├─ <span style="color:#86efac">lnmake.html</span> ← 書類作成画面<br>
+        ├─ <span style="color:#c4b5fd">lnmanual.html</span> ← マニュアル（いまここ）<br>
+        └─ <span style="color:#fdba74">lngame.html</span> ← 実績・レベル画面
+      </div>
+      <p class="note">db_game.js は db_case.js の USERS.role と actionLog を読み取ってポイント計算します。</p>
+    </div></details>
+
+    <details class="c" id="sec-1-9"><summary><span class="manual-num">1.9</span>現在のサンプルデータ一覧<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('1.9','現在のサンプルデータ一覧')">📝 改善提案</button></summary>
+    <div class="bd">
+      <h4 style="margin:0 0 8px;font-size:12px;font-weight:700">登録ユーザー（8名）</h4>
+      <div style="font-size:11px;line-height:1.8">
+        <span class="bg bg-beg" style="margin-right:4px">beginner</span> 織田信長・豊臣秀吉・徳川家康<br>
+        <span class="bg bg-exp" style="margin-right:4px">expert</span> 伊達政宗・真田幸村・上杉謙信<br>
+        <span class="bg bg-ldr" style="margin-right:4px">leader</span> 源頼朝・足利尊氏
+      </div>
+      <h4 style="margin:14px 0 8px;font-size:12px;font-weight:700">登録LN（13件）</h4>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <tr><th>LN</th><th>申立人</th><th>相手方</th><th>IP数</th><th>ステータス</th></tr>
+        <tr><td class="ln-id">7K14488</td><td>ナチュ</td><td>KDDI</td><td>51</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">9S14492</td><td>ナチュ</td><td>ソフトバンク</td><td>64</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">1K14196</td><td>キングダム</td><td>KDDI</td><td>45</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">10K14630</td><td>CONT</td><td>KDDI</td><td>59</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">12K14661</td><td>CONT</td><td>ソフトバンク</td><td>74</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">1S14671</td><td>CONT</td><td>ソフトバンク</td><td>83</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">2A14651</td><td>CONT</td><td>アルテリア</td><td>36</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr><td class="ln-id">1IM14652</td><td>CONT</td><td>マルチフィード</td><td>40</td><td class="st-ok">すぐ作成可能</td></tr>
+        <tr class="warn-row"><td class="ln-id">7S14487</td><td>ナチュ</td><td>ソフトバンク</td><td>55</td><td class="st-wait">証明書待ち</td></tr>
+        <tr class="warn-row"><td class="ln-id">2N14091</td><td>CONT</td><td>NTTコム</td><td>80</td><td class="st-wait">委任状待ち</td></tr>
+        <tr class="warn-row"><td class="ln-id">4N14093</td><td>CONT</td><td>NTTコム</td><td>84</td><td class="st-wait">委任状待ち</td></tr>
+        <tr class="warn-row"><td class="ln-id">6K14640</td><td>CONT</td><td>KDDI</td><td>89</td><td class="st-wait">証明書待ち</td></tr>
+        <tr class="warn-row"><td class="ln-id">1SO14655</td><td>CONT</td><td>So-net</td><td>38</td><td class="st-wait">pl処理中</td></tr>
+      </table>
+      </div>
+      <p class="note">全13件のLNが登録済み。8件が「すぐ作成可能」、5件が待ち/処理中です。</p>
+    </div></details>
+  </div>
+
+  <!-- ========== 証拠の集め方 ========== -->
+  <div class="grp" data-g="evidence">
+    <h2 class="grp-title"><span class="section-num">2.</span>証拠の集め方</h2>
+
+    <details class="c" id="inin" data-sec="2.1" open><summary><span class="manual-num">2.1</span>委任状の集め方<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.1','委任状の集め方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>委任状</strong>は、申立人（権利者会社）から弁護士へ代理権を委任することを証明する書類です。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">必要な情報</h4>
+      <ul>
+        <li><strong>申立人の正式名称</strong> — 会社名、代表者名</li>
+        <li><strong>弁護士名</strong> — 手続代理人となる弁護士全員の氏名</li>
+        <li><strong>事件名</strong> — 発信者情報開示命令申立事件</li>
+        <li><strong>作成日</strong> — 申立日から3ヶ月以内であることを確認</li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">集め方の手順</h4>
+      <ol>
+        <li><strong>申立人に連絡</strong> — メールまたは電話で委任状の作成を依頼</li>
+        <li><strong>テンプレートを送付</strong> — 弁護士事務所から提供されるテンプレートを使用</li>
+        <li><strong>記入・押印を依頼</strong> — 申立人側で記入・代表者印を押印してもらう</li>
+        <li><strong>原本を郵送で受領</strong> — PDFではなく原本が必要</li>
+        <li><strong>内容確認</strong> — 弁護士名、申立人名、日付が正しいか確認</li>
+        <li><strong>有効期限チェック</strong> — 取得から3ヶ月以内であることを確認</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>委任状は<strong>原本</strong>が必要（コピー不可）</li>
+          <li>代表者印（会社実印）が押印されていること</li>
+          <li>複数の弁護士が担当する場合、全員の氏名が記載されていること</li>
+          <li>作成日から<strong>3ヶ月</strong>を超えると無効</li>
+        </ul>
+      </div>
+      
+      <p class="note">申立人ごとに委任状の書式が異なる場合があるので、担当弁護士に確認してください。</p>
+    </div></details>
+
+    <details class="c" id="daihyou" data-sec="2.2"><summary><span class="manual-num">2.2</span>代表者事項証明書の集め方<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.2','代表者事項証明書の集め方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>代表者事項証明書</strong>は、会社の代表者が正式に登記されていることを証明する書類です。法務局で取得します。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">必要な情報</h4>
+      <ul>
+        <li><strong>会社の正式名称</strong> — 登記簿上の名称</li>
+        <li><strong>本店所在地</strong></li>
+        <li><strong>代表者氏名</strong></li>
+        <li><strong>会社法人等番号</strong> — あると取得がスムーズ</li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">取得方法（3つの方法）</h4>
+      <div class="grid grid-3" style="margin:12px 0">
+        <div class="chip" style="background:#eff6ff">
+          <strong style="color:#2563eb">① オンライン申請</strong><br>
+          <small>登記・供託オンライン申請システムで申請。郵送または窓口受取</small>
+        </div>
+        <div class="chip" style="background:#ecfdf5">
+          <strong style="color:#059669">② 窓口申請</strong><br>
+          <small>最寄りの法務局で申請書を記入して提出。即日発行</small>
+        </div>
+        <div class="chip" style="background:#f5f3ff">
+          <strong style="color:#7e3af2">③ 郵送申請</strong><br>
+          <small>申請書と返信用封筒を法務局に郵送</small>
+        </div>
+      </div>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">集め方の手順</h4>
+      <ol>
+        <li><strong>申立人に確認</strong> — 会社の正式名称、本店所在地を確認</li>
+        <li><strong>取得方法を決定</strong> — オンライン・窓口・郵送のいずれか</li>
+        <li><strong>手数料を準備</strong> — 1通600円（窓口は収入印紙、オンラインは電子納付）</li>
+        <li><strong>申請書を作成</strong> — 法務局の書式に従って記入</li>
+        <li><strong>証明書を取得</strong> — 発行されたら内容を確認</li>
+        <li><strong>有効期限を確認</strong> — 取得から3ヶ月以内</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>取得から<strong>3ヶ月以内</strong>のものが有効</li>
+          <li>代表者の氏名が正しく記載されているか確認</li>
+          <li>古い証明書を使い回さないこと</li>
+          <li>申立人が複数の場合、それぞれの証明書が必要</li>
+        </ul>
+      </div>
+      
+      <p class="note">オンライン申請が便利です。<a href="https://www.touki-kyoutaku-online.moj.go.jp/" target="_blank" rel="noopener">登記・供託オンライン申請システム →</a></p>
+    </div></details>
+
+    <details class="c" id="usb-shouko" data-sec="2.3"><summary><span class="manual-num">2.3</span>甲1: USB 著作物の集め方<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.3','甲1: USB 著作物の集め方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>甲1号証（USB著作物）</strong>は、侵害された著作物そのものを証拠として提出するためのUSBメモリです。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">必要なもの</h4>
+      <ul>
+        <li><strong>著作物の動画ファイル</strong> — 申立人が権利を持つ動画</li>
+        <li><strong>USBメモリ</strong> — 新品または完全にフォーマットしたもの</li>
+        <li><strong>ファイル名の命名規則</strong> — LN番号とファイル番号を含める</li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">作成手順</h4>
+      <ol>
+        <li><strong>申立人から著作物を受領</strong> — GoogleDrive、転送サービス、または直接受取</li>
+        <li><strong>ファイル形式を確認</strong> — MP4、AVI、MOVなど一般的な形式</li>
+        <li><strong>USBを準備</strong> — 容量は動画サイズに合わせる（通常8GB〜32GB）</li>
+        <li><strong>ファイルをコピー</strong> — 著作物をUSBのルートディレクトリにコピー</li>
+        <li><strong>ファイル名を確認</strong> — 例: 7K14488_01.mp4</li>
+        <li><strong>再生確認</strong> — 正常に再生できることを確認</li>
+        <li><strong>ラベルを貼付</strong> — USB本体にLN番号を記載</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>著作物は<strong>申立人から正式に受領</strong>したもののみ使用</li>
+          <li>ファイルが破損していないか必ず再生確認</li>
+          <li>USBにウイルスチェックを実施</li>
+          <li>裁判所提出用なので、余計なファイルを入れない</li>
+          <li>USBは<strong>書き込み可能な状態</strong>で提出（ロックしない）</li>
+        </ul>
+      </div>
+      
+      <p class="note">複数の著作物がある場合は、すべて1つのUSBにまとめて入れます。ファイル名の連番で区別してください。</p>
+    </div></details>
+
+    <details class="c" id="beppyou" data-sec="2.4"><summary><span class="manual-num">2.4</span>別紙の種類と集め方<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.4','別紙の種類と集め方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>別紙</strong>は申立書に添付する一覧表です。以下の4種類があります。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">4種類の別紙</h4>
+      <div class="grid grid-2" style="font-size:11px">
+        <div class="chip" style="background:#eff6ff">
+          <strong style="color:#2563eb">① 当事者目録</strong><br>
+          申立人・相手方・代理人弁護士の情報
+        </div>
+        <div class="chip" style="background:#ecfdf5">
+          <strong style="color:#059669">② 著作物目録</strong><br>
+          権利侵害された著作物の一覧
+        </div>
+        <div class="chip" style="background:#f5f3ff">
+          <strong style="color:#7e3af2">③ 動画目録</strong><br>
+          侵害動画のURL、タイトル、アップロード日時
+        </div>
+        <div class="chip" style="background:#fff7ed">
+          <strong style="color:#ea580c">④ 発信者情報目録</strong><br>
+          開示を求める情報（IPアドレス、タイムスタンプ等）
+        </div>
+      </div>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">集め方・作成手順</h4>
+      
+      <p style="margin:10px 0 4px;font-weight:600">① 当事者目録</p>
+      <ul style="font-size:11px">
+        <li>申立人の正式名称、代表者名、住所 — 登記簿謄本から転記</li>
+        <li>相手方（プロバイダ）の情報 — 公式サイトから取得</li>
+        <li>弁護士の氏名、事務所名、住所 — 委任状と一致させる</li>
+      </ul>
+      
+      <p style="margin:10px 0 4px;font-weight:600">② 著作物目録</p>
+      <ul style="font-size:11px">
+        <li>著作物のタイトル、発行日、著作者名</li>
+        <li>DVD品番、ISBN等の識別番号</li>
+        <li>申立人から提供された情報をもとに作成</li>
+      </ul>
+      
+      <p style="margin:10px 0 4px;font-weight:600">③ 動画目録</p>
+      <ul style="font-size:11px">
+        <li>侵害動画のURL（証拠保全したもの）</li>
+        <li>動画タイトル、再生時間</li>
+        <li>アップロード日時、発見日時</li>
+        <li><strong>IPNデータベース</strong>から自動生成可能</li>
+      </ul>
+      
+      <p style="margin:10px 0 4px;font-weight:600">④ 発信者情報目録</p>
+      <ul style="font-size:11px">
+        <li>発信者のIPアドレス</li>
+        <li>タイムスタンプ（通信日時）</li>
+        <li>ポート番号</li>
+        <li>プロバイダから提供された<strong>loファイル</strong>から転記</li>
+      </ul>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>すべての別紙に<strong>「別紙」</strong>と明記</li>
+          <li>ページ番号を振る</li>
+          <li>申立書本文から「別紙〇〇参照」で参照される形式</li>
+          <li>誤記がないか<strong>複数人でダブルチェック</strong></li>
+        </ul>
+      </div>
+      
+      <p class="note">書類作成画面（lnmake.html）の「申立書作成」タブで、別紙も自動生成できます。<a href="lnmake.html">→ 書類作成画面へ</a></p>
+    </div></details>
+
+    <details class="c" id="box-tsume" data-sec="2.5"><summary><span class="manual-num">2.5</span>書類ボックス詰めの手順<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.5','書類ボックス詰めの手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>裁判所に提出する書類をボックスにまとめる作業です。順番と内容が重要です。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">必要書類チェックリスト</h4>
+      <ul class="ck" id="ck-box">
+        <li><input type="checkbox"><div><div class="dn">委任状（原本）</div><div class="nt">申立人から受領した原本</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">代表者事項証明書</div><div class="nt">取得から3ヶ月以内</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">申立書（正本・副本）</div><div class="nt">正本1通、副本は相手方の数</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">証拠説明書</div><div class="nt">甲号証の一覧表</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">別紙4種</div><div class="nt">当事者・著作物・動画・発信者情報</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">甲号証（甲1〜甲13）</div><div class="nt">印刷物またはPDF（USB）</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">収入印紙</div><div class="nt">申立手数料（金額は案件による）</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">KK（DB記録印刷書面）</div><div class="nt">申立人により不要の場合あり</div></div></li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">ボックス詰めの順番</h4>
+      <ol>
+        <li><strong>申立書（正本）</strong> — 一番上</li>
+        <li><strong>証拠説明書</strong></li>
+        <li><strong>甲号証</strong> — 甲1、甲2...の順番</li>
+        <li><strong>別紙4種</strong> — 当事者→著作物→動画→発信者情報の順</li>
+        <li><strong>委任状</strong></li>
+        <li><strong>代表者事項証明書</strong></li>
+        <li><strong>その他</strong> — KK、追加資料等</li>
+      </ol>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">確認ポイント</h4>
+      <ul>
+        <li>各書類の<strong>ページ数</strong>が揃っているか</li>
+        <li>ホチキス留めは<strong>左上1箇所</strong></li>
+        <li>USB等の電子媒体は<strong>専用ケース</strong>に入れる</li>
+        <li>ボックスに<strong>LN番号</strong>を明記</li>
+        <li>提出先裁判所・提出日を確認</li>
+      </ul>
+      
+      <div class="warn">
+        <strong>よくあるミス</strong>
+        <ul>
+          <li>委任状の有効期限切れ（3ヶ月超過）</li>
+          <li>代表者事項証明書の有効期限切れ</li>
+          <li>別紙の順番が違う</li>
+          <li>甲号証の欠落（甲5が抜けている等）</li>
+          <li>申立書と別紙の内容不一致</li>
+        </ul>
+      </div>
+      
+      <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+        <button class="btn" onclick="document.querySelectorAll('#ck-box input').forEach(c=>{c.checked=false});upCkBox()">クリア</button>
+        <span style="font-size:12px;color:#64748b" id="ck-box-cnt">0 / 8 件完了</span>
+      </div>
+      
+      <p class="note">提出前に必ず<strong>expert</strong>または<strong>leader</strong>による最終確認を受けてください。</p>
+    </div></details>
+
+    <details class="c" id="shoumei" data-sec="2.6"><summary><span class="manual-num">2.6</span>証拠説明書の作成<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.6','証拠説明書の作成')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>証拠説明書</strong>は、甲号証（証拠）の一覧表です。各証拠の番号、標目、原本・写しの別、作成日、作成者、立証趣旨を記載します。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">記載項目</h4>
+      <div class="grid grid-2" style="font-size:11px">
+        <div><strong>証拠番号</strong> — 甲1、甲2、甲3...と連番</div>
+        <div><strong>標目</strong> — 証拠の名称（例: DVDパッケージ画像）</div>
+        <div><strong>原本・写しの別</strong> — 原本 or 写し or 電磁的記録</div>
+        <div><strong>作成日</strong> — 証拠が作成された日付</div>
+        <div><strong>作成者</strong> — 誰が作成したか</div>
+        <div><strong>立証趣旨</strong> — 何を証明するための証拠か</div>
+      </div>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">作成手順</h4>
+      <ol>
+        <li><strong>甲号証を整理</strong> — すべての証拠を番号順に並べる</li>
+        <li><strong>書類作成画面を開く</strong> — lnmake.htmlの「証拠を集める」タブ</li>
+        <li><strong>「証拠説明書を生成」</strong>ボタンをクリック</li>
+        <li><strong>プレビュー確認</strong> — 内容に誤りがないか確認</li>
+        <li><strong>PDF出力またはMarkdown出力</strong> — 必要な形式で保存</li>
+        <li><strong>印刷</strong> — A4サイズで印刷し、押印</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>甲号証の番号は<strong>絶対に飛ばさない</strong>（甲1→甲2→甲3...）</li>
+          <li>立証趣旨は<strong>具体的に</strong>書く（「申立人が著作権者であること」等）</li>
+          <li>日付は<strong>令和表記</strong>を使用</li>
+          <li>作成日が不明な場合は「日付不明」と記載</li>
+        </ul>
+      </div>
+      
+      <p class="note">書類作成画面で自動生成できます。<a href="lnmake.html">→ 書類作成画面へ</a></p>
+    </div></details>
+
+    <details class="c" id="kk" data-sec="2.7"><summary><span class="manual-num">2.7</span>KK（DB記録印刷書面）の集め方<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.7','KK（DB記録印刷書面）の集め方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>KK（DB記録印刷書面）</strong>は、申立人の社内データベースから、違法アップロード動画の記録を印刷した書面です。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">KKに含まれる情報</h4>
+      <ul>
+        <li><strong>動画タイトル</strong> — 侵害された著作物のタイトル</li>
+        <li><strong>URL</strong> — 違法アップロードされた動画のURL</li>
+        <li><strong>発見日時</strong> — いつ発見されたか</li>
+        <li><strong>IPアドレス</strong> — アップロード者のIP</li>
+        <li><strong>Torrent情報</strong> — ハッシュ値、ピア情報等</li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">集め方</h4>
+      <ol>
+        <li><strong>申立人に依頼</strong> — 該当LNのKKデータ抽出を依頼</li>
+        <li><strong>CSVまたはPDFで受領</strong> — GoogleDrive経由が一般的</li>
+        <li><strong>内容確認</strong> — IPアドレス、日時が正しいか確認</li>
+        <li><strong>印刷</strong> — A4サイズで印刷（両面可）</li>
+        <li><strong>ページ番号を振る</strong> — 「1/10」「2/10」...と記載</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>注意点</strong>
+        <ul>
+          <li>申立人によっては<strong>KK不要</strong>の場合あり（弁護士に確認）</li>
+          <li>個人情報が含まれる場合は取り扱いに注意</li>
+          <li>印刷時に<strong>文字が切れない</strong>よう余白を確保</li>
+          <li>大量ページの場合は<strong>PDF化</strong>も検討</li>
+        </ul>
+      </div>
+      
+      <p class="note">KKの要否は申立人・弁護士により異なります。LN一覧の「KK状況」列で確認してください。</p>
+    </div></details>
+
+    <details class="c" id="pl" data-sec="2.8"><summary><span class="manual-num">2.8</span>pl（証拠PDF）の確認<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('2.8','pl（証拠PDF）の確認')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>pl（証拠PDF）</strong>は、甲号証（甲1〜甲13等）をまとめた1つの大きなPDFファイルです。自動生成されます。</p>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">plに含まれる証拠</h4>
+      <ul>
+        <li><strong>甲1</strong> — USB著作物（動画ファイル）のスクリーンショット</li>
+        <li><strong>甲2〜甲9</strong> — 違法アップロード動画のスクリーンショット</li>
+        <li><strong>甲10</strong> — 再生試験報告書</li>
+        <li><strong>甲11</strong> — プロバイダへの照会結果</li>
+        <li><strong>甲12</strong> — IPアドレス一覧</li>
+        <li><strong>甲13</strong> — DVDパッケージ画像</li>
+        <li><strong>甲14</strong> — 著作権証明書類</li>
+      </ul>
+      
+      <h4 style="margin:14px 0 6px;font-size:13px">確認手順</h4>
+      <ol>
+        <li><strong>GoogleDriveで開く</strong> — 各LNのDriveフォルダに自動アップロードされる</li>
+        <li><strong>ページ数を確認</strong> — 欠落がないか</li>
+        <li><strong>画質を確認</strong> — 文字が読めるか、画像が鮮明か</li>
+        <li><strong>順番を確認</strong> — 甲1→甲2→...と正しい順序か</li>
+        <li><strong>ファイルサイズを確認</strong> — 異常に大きい・小さい場合は要確認</li>
+      </ol>
+      
+      <div class="warn">
+        <strong>エラーが発生した場合</strong>
+        <ul>
+          <li><strong>「pl処理中」</strong>のままの場合 → 自動処理の完了を待つ（通常1〜2時間）</li>
+          <li><strong>ページ欠落</strong> → expertに報告、plリセットを依頼</li>
+          <li><strong>画質不良</strong> → 元画像の確認、再生成を検討</li>
+        </ul>
+      </div>
+      
+      <p class="note">plの生成状況はLN一覧の「pl状況」列で確認できます。<a href="lnportal.html">→ ポータルへ</a></p>
+    </div></details>
+
+  </div>
+
+  <!-- ========== LN確認 ========== -->
+  <div class="grp" data-g="ln-check">
+    <h2 class="grp-title"><span class="section-num">3.</span>LN確認（beginner）</h2>
+
+    <details class="c" id="sec-3-1" data-sec="3.1"><summary><span class="manual-num">3.1</span>LN確認の手順<span class="bg bg-beg">beginner</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('3.1','LN確認の手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>初めての方でも大丈夫！今日やるLNを確認して、問題なければ報告するだけです。</p>
+      <ol>
+        <li><strong>ポータルの「ホーム」</strong>を開いて、ステップナビの案内に従う</li>
+        <li><strong>「LN一覧」タブ</strong>で「今日やること」のLNを確認</li>
+        <li><strong>LNをクリック</strong>すると詳細が開く</li>
+        <li><strong>チェックリスト</strong>を見て、全部✓か確認</li>
+        <li><strong>CSVとDrive</strong>の中身を確認。ファイルが揃っていればOK</li>
+        <li><strong>問題なければ</strong>「確認完了しました」で報告</li>
+      </ol>
+      <p class="note">不安な点や×があれば、expertに相談してください。<br><a href="lnportal.html">→ ポータルのLN一覧へ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-3-2" data-sec="3.2"><summary><span class="manual-num">3.2</span>CSV・Drive確認手順<span class="bg bg-beg">beginner</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('3.2','CSV・Drive確認手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>CSV:</strong> 申立書に使うデータファイル。「CSVダウンロード」ボタンからダウンロードできればOK。</p>
+      <p><strong>Drive:</strong> そのLN用のフォルダがあり、中にPDFが入っていれば問題なし。</p>
+      <p class="note">何が入っているかわからなくても大丈夫。フォルダがあってファイルがいくつかあれば、expertに「確認しました」と報告してOKです。</p>
+    </div></details>
+
+    <details class="c" id="sec-3-3" data-sec="3.3"><summary><span class="manual-num">3.3</span>ポータルの画面の見方<span class="bg bg-beg">beginner</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('3.3','ポータルの画面の見方')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>サイドバーの5つのメニュー：</p>
+      <ul>
+        <li><strong>ホーム</strong> — ウェルカム画面。beginnerはステップナビが表示</li>
+        <li><strong>LN一覧</strong> — 全13件のLNカード。タブで切替</li>
+        <li><strong>マニュアル</strong> — このページ</li>
+        <li><strong>実績・レベル</strong> — レベルやポイント</li>
+        <li><strong>フィードバック</strong> — 気づいたことを報告</li>
+      </ul>
+      <p class="note">右上のユーザー切替で、ロール別の画面の違いも体験できます（8人登録）。</p>
+    </div></details>
+  </div>
+
+  <!-- ========== 書類ボックス詰め ========== -->
+  <div class="grp" data-g="box">
+    <h2 class="grp-title"><span class="section-num">4.</span>書類ボックス詰め</h2>
+
+    <details class="c" id="sec-4-1" data-sec="4.1" open><summary><span class="manual-num">4.1</span>書類ボックス詰めマニュアル<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('4.1','書類ボックス詰めマニュアル')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>裁判所に出す書類を、決まったボックスにまとめて入れる作業です。</p>
+      <h4 style="margin:14px 0 6px;font-size:13px">作業の流れ</h4>
+      <ol>
+        <li>LNごとの提出用書類が揃っているか確認</li>
+        <li>必要書類を<strong>順番通り</strong>に集める</li>
+        <li>指定のボックスに、案件ごとにまとめて入れる</li>
+        <li>入れたらチェックリストにチェック</li>
+      </ol>
+      <h4 style="margin:14px 0 6px;font-size:13px">必要な書類</h4>
+      <div class="dg">
+        <div><span>📄</span>委任状</div>
+        <div><span>📋</span>代表者事項証明書</div>
+        <div><span>📝</span>KK</div>
+        <div><span>📑</span>申立書</div>
+        <div><span>📄</span>証拠説明書</div>
+        <div><span>📎</span>別紙類</div>
+        <div><span>💾</span>甲号証PDF</div>
+      </div>
+      <div class="warn">
+        <strong>注意</strong>
+        <ul>
+          <li>委任状・代表者事項証明書は<strong>有効期限（取得から3ヶ月）</strong>を確認</li>
+          <li>弁護士名と委任状の内容が一致しているか確認</li>
+          <li>ボックスに<strong>LN番号</strong>を明記して区別する</li>
+        </ul>
+      </div>
+      <h4 style="margin:18px 0 8px;font-size:13px">チェックリスト</h4>
+      <ul class="ck" id="ck">
+        <li><input type="checkbox"><div><div class="dn">委任状</div><div class="nt">申立人・弁護士名を確認</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">代表者事項証明書</div><div class="nt">有効期限3ヶ月以内</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">KK（DB記録印刷書面）</div><div class="nt">CPにより不要の場合あり</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">申立書</div><div class="nt">正本・写しの指定確認</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">証拠説明書</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">別紙類</div><div class="nt">当事者目録・著作物目録・動画目録・発信者情報目録</div></div></li>
+        <li><input type="checkbox"><div><div class="dn">甲号証PDF</div><div class="nt">USB等の媒体指定あり</div></div></li>
+      </ul>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+        <button class="btn" onclick="document.querySelectorAll('#ck input').forEach(c=>{c.checked=false});upCk()">クリア</button>
+        <span style="font-size:12px;color:#64748b" id="ck-cnt">0 / 7 件完了</span>
+      </div>
+    </div></details>
+  </div>
+
+  <!-- ========== expert業務 ========== -->
+  <div class="grp" data-g="expert">
+    <h2 class="grp-title"><span class="section-num">5.</span>expert業務（申立書 + LN管理）</h2>
+
+    <details class="c" id="sec-5-1" data-sec="5.1"><summary><span class="manual-num">5.1</span>申立書の種類と概要<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.1','申立書の種類と概要')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>申立書は「裁判所へお願いする書類」。3種類あります：</p>
+      <div class="grid grid-3">
+        <div class="chip" style="background:#eff6ff"><strong style="color:#2563eb">開示命令書</strong><br>開示のみ。最も基本的</div>
+        <div class="chip" style="background:#f5f3ff"><strong style="color:#7e3af2">＋消去禁止</strong><br>開示＋ログ消去禁止</div>
+        <div class="chip" style="background:#ecfdf5"><strong style="color:#059669">＋提供命令</strong><br>開示＋情報提供を求める</div>
+      </div>
+      <p class="note"><a href="lnmake.html">→ 書類作成画面へ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-5-2" data-sec="5.2"><summary><span class="manual-num">5.2</span>申立書作成手順<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.2','申立書作成手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <ol>
+        <li>書類作成画面の「書類作成」タブを開く</li>
+        <li>テンプレを選ぶ（開示のみ / 消去禁止 / 提供命令）</li>
+        <li>著作権パターンを選択</li>
+        <li>別紙の内容確認、証拠の品質確認</li>
+        <li>プレビューで確認し、Word(.docx)またはテキストで出力</li>
+        <li>弁護士さんにチェックをお願いして送付</li>
+      </ol>
+      <p class="note">テンプレートは24種類以上。CP・弁護士ごとの専用テンプレがあります。</p>
+    </div></details>
+
+    <details class="c" id="sec-5-3" data-sec="5.3"><summary><span class="manual-num">5.3</span>証拠用USB作成手順<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.3','証拠用USB作成手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <ul>
+        <li>pl（証拠PDF）が完成しているか確認</li>
+        <li>LNごとに、決まったフォーマットでUSBに入れる</li>
+        <li>納品先・枚数・ラベルの指定を確認してから作成</li>
+      </ul>
+    </div></details>
+
+    <details class="c" id="sec-5-4" data-sec="5.4"><summary><span class="manual-num">5.4</span>証拠の収集（証拠を集めるタブ）<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.4','証拠の収集（証拠を集めるタブ）')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>書類作成画面の「証拠を集める」タブでは：</p>
+      <ul>
+        <li>IP関連の証拠チェックリスト</li>
+        <li>IPN（動画DB）の参照・ナビゲーション</li>
+        <li>証拠説明書の自動生成</li>
+        <li>証拠説明書のMarkdown / PDF出力</li>
+      </ul>
+    </div></details>
+
+    <details class="c" id="sec-5-5" data-sec="5.5"><summary><span class="manual-num">5.5</span>新規LN登録手順<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.5','新規LN登録手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>新しい事件が来たら登録。入力: 申立人（CP）・相手方・作品番号・申立日・裁判所 など。</p>
+      <p>登録後: lo取得 → pl作成 → beginner準備確認 → 申立書作成 の流れ。</p>
+      <p class="note">現在登録LN: 全13件（7K14488, 9S14492, 1K14196 ほか）</p>
+    </div></details>
+
+    <details class="c" id="sec-5-6" data-sec="5.6"><summary><span class="manual-num">5.6</span>lo/plリセット手順<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.6','lo/plリセット手順')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong>loのリセット:</strong> プロバイダから届くPDFがまだ来ていないとき。もう一度取得を実行。</p>
+      <p><strong>plのリセット:</strong> 証拠PDFでエラーが出たとき。再生成後にDrive・USBと照合。</p>
+    </div></details>
+
+    <details class="c" id="sec-5-7" data-sec="5.7"><summary><span class="manual-num">5.7</span>LN一覧のステータス表示<span class="bg bg-exp">expert</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('5.7','LN一覧のステータス表示')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>ポータルのLN一覧タブ：</p>
+      <ul>
+        <li><strong>すべて</strong> — 全13件</li>
+        <li><strong>今日やること（Ready）</strong> — すぐ作成可能なLN</li>
+        <li><strong>要対応</strong> — 委任状待ち・証明書待ちなど</li>
+        <li><strong>pl処理中</strong> — PDF生成途中</li>
+      </ul>
+    </div></details>
+  </div>
+
+  <!-- ========== 実績・レベル ========== -->
+  <div class="grp" data-g="game">
+    <h2 class="grp-title"><span class="section-num">6.</span>実績・レベル</h2>
+
+    <details class="c" id="sec-6-1" data-sec="6.1"><summary><span class="manual-num">6.1</span>レベルシステム<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('6.1','レベルシステム')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>日々の業務でポイントが貯まり、レベルが上がります。</p>
+      <div class="grid grid-2" style="font-size:11px">
+        <div class="chip" style="background:#f8fafc">Lv.1 <strong>Private</strong> (0pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.2 <strong>Corporal</strong> (100pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.3 <strong>Sergeant</strong> (300pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.4 <strong>Staff Sgt.</strong> (600pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.5 <strong>Sgt. Major</strong> (1000pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.6 <strong>2nd Lieutenant</strong> (1500pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.7 <strong>1st Lieutenant</strong> (2500pt〜)</div>
+        <div class="chip" style="background:#f8fafc">Lv.8 <strong>Captain</strong> (4000pt〜)</div>
+      </div>
+      <p class="note"><a href="lngame.html">→ 実績・レベルページへ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-6-2" data-sec="6.2"><summary><span class="manual-num">6.2</span>ポイント一覧（14種）<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('6.2','ポイント一覧（14種）')">📝 改善提案</button></summary>
+    <div class="bd">
+      <div class="grid grid-2" style="font-size:11px">
+        <div class="chip" style="background:#ecfdf5"><strong>LN確認:</strong> 10pt</div>
+        <div class="chip" style="background:#ecfdf5"><strong>完了報告:</strong> 50pt</div>
+        <div class="chip" style="background:#ecfdf5"><strong>本日対応完了:</strong> 30pt</div>
+        <div class="chip" style="background:#eff6ff"><strong>証拠確認:</strong> 2pt</div>
+        <div class="chip" style="background:#eff6ff"><strong>USB確認:</strong> 5pt</div>
+        <div class="chip" style="background:#eff6ff"><strong>書類確認:</strong> 5pt</div>
+        <div class="chip" style="background:#eff6ff"><strong>同一ファイル確認:</strong> 10pt</div>
+        <div class="chip" style="background:#f5f3ff"><strong>証拠説明書:</strong> 30pt</div>
+        <div class="chip" style="background:#f5f3ff"><strong>別紙確認:</strong> 15pt</div>
+        <div class="chip" style="background:#f5f3ff"><strong>ボックス確認:</strong> 20pt</div>
+        <div class="chip" style="background:#fff7ed"><strong>申立書作成:</strong> 50pt</div>
+        <div class="chip" style="background:#fff7ed"><strong>テンプレ追加:</strong> 20pt</div>
+        <div class="chip" style="background:#fef2f2"><strong>LN納品:</strong> 100pt</div>
+        <div class="chip" style="background:#fffbeb"><strong>beginner指導:</strong> 50pt</div>
+      </div>
+    </div></details>
+
+    <details class="c" id="sec-6-3" data-sec="6.3"><summary><span class="manual-num">6.3</span>日次ランク（6段階）<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('6.3','日次ランク（6段階）')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>1日に獲得したポイントでその日のランクが決まります：</p>
+      <p style="line-height:2.2;margin-top:8px">スタート地点（0pt〜） → いい調子（30pt〜） → ナイス仕事（80pt〜） → プロの動き（150pt〜） → MVP級（250pt〜） → 伝説の一日（400pt〜）</p>
+    </div></details>
+
+    <details class="c" id="sec-6-4" data-sec="6.4"><summary><span class="manual-num">6.4</span>実績ページの3つのタブ<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('6.4','実績ページの3つのタブ')">📝 改善提案</button></summary>
+    <div class="bd">
+      <ul>
+        <li><strong>マイページ</strong> — レベルバー、昇進チェック、スキルパス</li>
+        <li><strong>日次レポート</strong> — 今日のポイント履歴・ランク</li>
+        <li><strong>リーダーボード</strong> — チーム全体のレベル・月間実績</li>
+      </ul>
+    </div></details>
+
+    <details class="c" id="sec-6-5" data-sec="6.5"><summary><span class="manual-num">6.5</span>昇進条件<span class="bg bg-all">全レベル</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('6.5','昇進条件')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p><strong style="color:#059669">beginner → expert:</strong><br>LN確認30件 / Lv.3到達 / CSV確認正確率90%以上 / 連続勤務5日 / expert推薦1名</p>
+      <p style="margin-top:10px"><strong style="color:#2563eb">expert → leader:</strong><br>申立書作成50件 / Lv.6到達 / beginner指導3名 / エラー率5%以下 / 在籍6ヶ月以上 / leader推薦</p>
+    </div></details>
+  </div>
+
+  <!-- ========== leader ========== -->
+  <div class="grp" data-g="leader">
+    <h2 class="grp-title"><span class="section-num">7.</span>leader向け</h2>
+
+    <details class="c" id="sec-7-1" data-sec="7.1"><summary><span class="manual-num">7.1</span>LN状況・書類把握<span class="bg bg-ldr">leader</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('7.1','LN状況・書類把握')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>ポータルのLN一覧で書類の収集状況を確認。「ステータスビュー」でマトリクス表示できます。</p>
+      <p style="margin-top:6px"><strong>コツ:</strong> 委任状とKKが揃ったLNから申立書作成を進めましょう。</p>
+      <p class="note"><a href="lnportal.html">→ ポータルへ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-7-2" data-sec="7.2"><summary><span class="manual-num">7.2</span>チーム進捗確認<span class="bg bg-ldr">leader</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('7.2','チーム進捗確認')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>実績ページの日次レポートで、チーム全員の進捗がひと目でわかります。</p>
+      <p class="note"><a href="lngame.html?panel=report">→ 日次レポートへ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-7-3" data-sec="7.3"><summary><span class="manual-num">7.3</span>リーダーボード<span class="bg bg-ldr">leader</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('7.3','リーダーボード')">📝 改善提案</button></summary>
+    <div class="bd">
+      <p>メンバーのレベル・月間申立実績・状況報告を一覧確認。現在8名（beginner×3, expert×3, leader×2）。</p>
+      <p class="note"><a href="lngame.html?panel=leaderboard">→ リーダーボードへ</a></p>
+    </div></details>
+
+    <details class="c" id="sec-7-4" data-sec="7.4"><summary><span class="manual-num">7.4</span>例外案件の対応フロー<span class="bg bg-ldr">leader</span><button class="feedback-btn" onclick="event.stopPropagation();openFeedbackModal('7.4','例外案件の対応フロー')">📝 改善提案</button></summary>
+    <div class="bd">
+      <ul>
+        <li><strong>KKが取れない場合</strong> — 全員退職している会社など。特別なルートで対応</li>
+        <li><strong>委任状の書き方が足りない場合</strong> — 担当弁護士に確認</li>
+        <li><strong>申立をやめる場合</strong> — LNを中止リストに移す</li>
+      </ul>
+    </div></details>
+  </div>
+
+  <!-- ========== フッターナビ ========== -->
+  <div class="ft">
+    <a href="lnportal.html"><strong>ポータル</strong><small>LN一覧・今日やること</small></a>
+    <a href="lnmake.html"><strong>書類作成</strong><small>申立書・証拠チェック</small></a>
+    <a href="lngame.html"><strong>実績・レベル</strong><small>ポイント・リーダーボード</small></a>
+  </div>
+
+</div>
+
+<!-- フィードバックモーダル -->
+<div id="feedbackModal" class="feedback-modal">
+  <div class="feedback-modal-content">
+    <div class="feedback-modal-header">
+      <div class="feedback-modal-title">📝 マニュアルへのフィードバック</div>
+      <span class="feedback-close" onclick="closeFeedbackModal()">×</span>
+    </div>
+    <div style="margin-bottom:12px;font-size:12px;color:#6b7280">
+      <strong id="feedbackSection"></strong> に関するご意見・改善提案をお聞かせください
+    </div>
+    <textarea id="feedbackText" class="feedback-textarea" placeholder="例: この手順がわかりにくい、画像があると助かる、最新の情報と違う、など"></textarea>
+    <button class="feedback-submit" onclick="submitFeedback()">送信</button>
+    <div id="feedbackStatus" style="margin-top:8px;font-size:11px;text-align:center"></div>
+  </div>
+</div>
+
+<!-- フィードバック一覧モーダル -->
+<div id="feedbackListModal" class="feedback-modal">
+  <div class="feedback-modal-content" style="max-width:700px">
+    <div class="feedback-modal-header">
+      <div class="feedback-modal-title">📋 フィードバック一覧</div>
+      <span class="feedback-close" onclick="closeFeedbackList()">×</span>
+    </div>
+    <div id="feedbackListContent" style="max-height:60vh;overflow-y:auto"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button onclick="exportFeedbacks()" style="flex:1;padding:8px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">📥 エクスポート（JSON）</button>
+      <button onclick="clearFeedbacks()" style="padding:8px 16px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">🗑️ クリア</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var T=document.getElementById('tabs'),G=document.querySelectorAll('.grp');
+T.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  T.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  var t=b.dataset.t;
+  G.forEach(function(g){g.style.display=(t==='all'||g.dataset.g===t)?'':'none'});
+});
+var p=new URLSearchParams(location.search).get('task');
+if(p){var b=T.querySelector('[data-t="'+p+'"]');if(b)b.click()}
+function upCk(){
+  var lis=document.querySelectorAll('#ck li'),n=0;
+  lis.forEach(function(li){var c=li.querySelector('input');li.classList.toggle('ok',c&&c.checked);if(c&&c.checked)n++});
+  var el=document.getElementById('ck-cnt');if(el)el.textContent=n+' / '+lis.length+' 件完了';
+}
+document.querySelectorAll('#ck input').forEach(function(c){c.addEventListener('change',upCk)});
+
+function upCkBox(){
+  var lis=document.querySelectorAll('#ck-box li'),n=0;
+  lis.forEach(function(li){var c=li.querySelector('input');li.classList.toggle('ok',c&&c.checked);if(c&&c.checked)n++});
+  var el=document.getElementById('ck-box-cnt');if(el)el.textContent=n+' / '+lis.length+' 件完了';
+}
+document.querySelectorAll('#ck-box input').forEach(function(c){c.addEventListener('change',upCkBox)});
+
+// フィードバック機能
+var currentFeedbackSection='';
+function openFeedbackModal(sectionNum,sectionTitle){
+  currentFeedbackSection=sectionNum;
+  document.getElementById('feedbackSection').textContent=sectionNum+' '+sectionTitle;
+  document.getElementById('feedbackText').value='';
+  document.getElementById('feedbackStatus').textContent='';
+  document.getElementById('feedbackModal').classList.add('active');
+}
+function closeFeedbackModal(){
+  document.getElementById('feedbackModal').classList.remove('active');
+}
+function submitFeedback(){
+  var text=document.getElementById('feedbackText').value.trim();
+  if(!text){alert('フィードバック内容を入力してください');return}
+  var feedback={
+    section:currentFeedbackSection,
+    text:text,
+    timestamp:new Date().toISOString(),
+    user:localStorage.getItem('currentUserId')||'anonymous'
+  };
+  var feedbacks=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  feedbacks.push(feedback);
+  localStorage.setItem('manual_feedbacks',JSON.stringify(feedbacks));
+  document.getElementById('feedbackStatus').innerHTML='<span style="color:#059669;font-weight:600">✓ 送信しました！ご意見ありがとうございます</span>';
+  setTimeout(closeFeedbackModal,2000);
+  console.log('フィードバック送信:',feedback);
+}
+document.getElementById('feedbackModal').addEventListener('click',function(e){
+  if(e.target.id==='feedbackModal')closeFeedbackModal();
+});
+document.getElementById('feedbackListModal').addEventListener('click',function(e){
+  if(e.target.id==='feedbackListModal')closeFeedbackList();
+});
+
+// フィードバック一覧表示
+function showFeedbackList(){
+  var feedbacks=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  var content=document.getElementById('feedbackListContent');
+  if(feedbacks.length===0){
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#9ca3af">まだフィードバックがありません</div>';
+  }else{
+    content.innerHTML=feedbacks.map(function(f,i){
+      var date=new Date(f.timestamp);
+      var dateStr=date.getFullYear()+'/'+(date.getMonth()+1)+'/'+date.getDate()+' '+date.getHours()+':'+String(date.getMinutes()).padStart(2,'0');
+      return '<div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:10px;background:#fff">'+
+        '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">'+
+        '<div><strong style="color:#2563eb">'+f.section+'</strong> <span style="font-size:11px;color:#9ca3af">'+dateStr+'</span></div>'+
+        '<button onclick="deleteFeedback('+i+')" style="background:#fef2f2;color:#dc2626;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600">削除</button>'+
+        '</div>'+
+        '<div style="font-size:12px;line-height:1.6;color:#374151;background:#f9fafb;padding:10px;border-radius:6px">'+f.text+'</div>'+
+        '</div>';
+    }).join('');
+  }
+  document.getElementById('feedbackListModal').classList.add('active');
+  updateFeedbackCount();
+}
+function closeFeedbackList(){
+  document.getElementById('feedbackListModal').classList.remove('active');
+}
+function deleteFeedback(index){
+  if(!confirm('このフィードバックを削除しますか？'))return;
+  var feedbacks=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  feedbacks.splice(index,1);
+  localStorage.setItem('manual_feedbacks',JSON.stringify(feedbacks));
+  showFeedbackList();
+  updateFeedbackCount();
+}
+function clearFeedbacks(){
+  if(!confirm('すべてのフィードバックを削除しますか？'))return;
+  localStorage.removeItem('manual_feedbacks');
+  showFeedbackList();
+  updateFeedbackCount();
+}
+function exportFeedbacks(){
+  var feedbacks=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  if(feedbacks.length===0){alert('エクスポートするフィードバックがありません');return}
+  var json=JSON.stringify({exportDate:new Date().toISOString(),totalFeedbacks:feedbacks.length,feedbacks:feedbacks},null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='manual_feedbacks_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function updateFeedbackCount(){
+  var feedbacks=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  var countEl=document.getElementById('feedbackCount');
+  if(countEl)countEl.textContent=feedbacks.length;
+}
+// 初期化
+updateFeedbackCount();
+
+// system_feedbacksとの統合（他ページのフィードバックも表示）
+function showAllFeedbacks(){
+  var manualFbs=JSON.parse(localStorage.getItem('manual_feedbacks')||'[]');
+  var systemFbs=JSON.parse(localStorage.getItem('system_feedbacks')||'[]').filter(function(f){return f.location && f.location.includes('マニュアル')});
+  var allFbs=manualFbs.concat(systemFbs).sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp)});
+  console.log('全フィードバック:',allFbs.length+'件');
+}
+</script>
+
+<!-- フィードバック固定ボタン（マニュアル専用は既存のボタンを使用） -->
+<style>
+.manual-feedback-float-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#7e3af2 0%,#6d28d9 100%);color:#fff;border:none;box-shadow:0 4px 12px rgba(126,58,242,0.4);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;z-index:9998;transition:all .3s}
+.manual-feedback-float-btn:hover{transform:scale(1.1)}
+</style>
+<button class="manual-feedback-float-btn" onclick="showFeedbackList()" title="フィードバック一覧: MAN-03"><span style="font-size:24px">📋</span><span class="element-id" style="position:absolute;top:2px;right:2px;font-size:7px;padding:1px 3px" title="要素ID: MAN-03">MAN-03</span></button>
+
+</body>
+</html>
