@@ -1094,58 +1094,58 @@
           <label for="template-select" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px;">（１）申立人が本件著作物の著作権者であること — 編集用テンプレ</label>
           <select id="template-select" onchange="showTemplate(this.value)" style="width: 100%; max-width: 480px; padding: 10px 14px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
             <option value="">— 選択してください —</option>
-            <optgroup label="①パッケージ系">
-              <option value="pkg1">①パッケージに著作表記があるパターン（ナチュ等）</option>
-              <option value="nacha-split">ナチュ（分割販売分）</option>
+            <optgroup label="━━ ①パッケージ系（DVD・Blu-rayパッケージに著作表記がある場合）━━">
+              <option value="pkg1">①パッケージ著作表記 - ナチュ、一般的なメーカー向け</option>
+              <option value="nacha-split">①ナチュ分割販売専用</option>
             </optgroup>
-            <optgroup label="②確認書系">
-              <option value="confirm2">②販売サイト＋確認書（複数監督）</option>
-              <option value="confirm2b">②の２ 同人に変えた監督パターン</option>
-              <option value="kadachiyama">角地山先生の確認書（複数）</option>
-              <option value="generic">汎用確認書パターン（甲14項目削除版）</option>
+            <optgroup label="━━ ②確認書系（監督・関係者の確認書がある場合）━━">
+              <option value="confirm2">②販売サイト画像＋確認書 - 複数監督パターン</option>
+              <option value="confirm2b">②-2 同人版監督パターン</option>
+              <option value="kadachiyama">②角地山先生の確認書（複数監督対応）</option>
+              <option value="generic">②汎用確認書（甲14項目削除版）</option>
             </optgroup>
-            <optgroup label="河田先生提出用">
-              <option value="groove">グルーヴ・ラボ</option>
-              <option value="cont-kawata">Cont（河田先生版）</option>
-              <option value="hohohosha">方々社（河田先生版）</option>
-              <option value="horizon">Horizon（河田先生修正・社長確認書）</option>
+            <optgroup label="━━ 河田先生提出用（特定弁護士専用パターン）━━">
+              <option value="groove">グルーヴ・ラボ - 河田先生版</option>
+              <option value="cont-kawata">CONT - 河田先生版</option>
+              <option value="hohohosha">方々社 - 河田先生版</option>
+              <option value="horizon">Horizon - 河田先生修正・社長確認書</option>
             </optgroup>
-            <optgroup label="MBM・hmp">
-              <option value="mbm">MBM（河田先生修正版・職務著作）</option>
-              <option value="hmp1">hmp1（製作・発売・販売表記）</option>
-              <option value="hmp2">hmp2（複合版・大塚先生編集）</option>
+            <optgroup label="━━ MBM・hmp（職務著作・特殊表記）━━">
+              <option value="mbm">MBM - 職務著作パターン（河田先生修正版）</option>
+              <option value="hmp1">hmp - 製作・発売・販売表記パターン</option>
+              <option value="hmp2">hmp - 複合版（大塚先生編集）</option>
             </optgroup>
-            <optgroup label="ベンハー">
-              <option value="benhur-transfer">ベンハー（譲渡契約書・最近は基本使わない）</option>
-              <option value="benhur2">ベンハー２（河田先生以外はこっちでもOK）</option>
-              <option value="benhur-kawata">ベンハー（河田先生修正版・公式サイト）</option>
+            <optgroup label="━━ ベンハー（譲渡契約・公式サイト表記）━━">
+              <option value="benhur-transfer">ベンハー - 譲渡契約書パターン（使用頻度低）</option>
+              <option value="benhur2">ベンハー2 - 標準版（河田先生以外OK）</option>
+              <option value="benhur-kawata">ベンハー - 河田先生版・公式サイト表記</option>
             </optgroup>
-            <optgroup label="プレステージ・ホット">
-              <option value="prestige1">プレステージ（商号・商標）</option>
-              <option value="prestige2">プレステージ２（河田先生修正版）</option>
+            <optgroup label="━━ プレステージ・ホット（商標・商号表記）━━">
+              <option value="prestige1">プレステージ - 商号・商標表記パターン</option>
+              <option value="prestige2">プレステージ2 - 河田先生修正版</option>
               <option value="hot">ホットエンターテイメント</option>
             </optgroup>
-            <optgroup label="Cont・ブルーコーナー・その他CP">
-              <option value="cont-multi">Cont（同一作品に複数監督）</option>
-              <option value="blue-normal">ブルーコーナー（通常版）</option>
-              <option value="blue-kawata">ブルーコーナー（河田先生修正版）</option>
+            <optgroup label="━━ その他メーカー━━">
+              <option value="cont-multi">CONT - 同一作品・複数監督パターン</option>
+              <option value="blue-normal">ブルーコーナー - 通常版</option>
+              <option value="blue-kawata">ブルーコーナー - 河田先生修正版</option>
               <option value="mka">エムケイエイチ</option>
               <option value="kspro">KSプロ</option>
             </optgroup>
-            <optgroup label="証拠説明書（甲号証）">
-              <option value="ev-standard">証拠説明書（標準構成）</option>
-              <option value="ev-mbm">MBM 証拠説明書</option>
-              <option value="ev-hot">ホットエンターテイメント 証拠説明書</option>
-              <option value="ev-multi">複数品番の証拠説明書用</option>
-              <option value="ev-benhur">ベンハー（譲渡契約書の場合）証拠</option>
-              <option value="ev-trademark">商標を使う場合（プレステージ等）</option>
-              <option value="ev-kmp">KMP・合意締結証明書セット</option>
-              <option value="ev-kawata">河田先生 確認書パターン証拠（甲14の１・２）</option>
-              <option value="ev-hohohosha">方々社 証拠説明書</option>
-              <option value="ev-blue">ブルーコーナー 証拠説明書</option>
-              <option value="ev-nacha">ナチュ（分割販売）証拠説明書</option>
-              <option value="ev-mka">エムケイエイチ 証拠説明書</option>
-              <option value="ev-kspro">KSプロ 証拠説明書</option>
+            <optgroup label="━━ 証拠説明書テンプレート（甲号証リスト作成用）━━">
+              <option value="ev-standard">証拠説明書 - 標準構成（一般用）</option>
+              <option value="ev-mbm">証拠説明書 - MBM専用</option>
+              <option value="ev-hot">証拠説明書 - ホットエンターテイメント専用</option>
+              <option value="ev-multi">証拠説明書 - 複数品番対応</option>
+              <option value="ev-benhur">証拠説明書 - ベンハー（譲渡契約書）</option>
+              <option value="ev-trademark">証拠説明書 - 商標利用（プレステージ等）</option>
+              <option value="ev-kmp">証拠説明書 - KMP・合意締結証明書セット</option>
+              <option value="ev-kawata">証拠説明書 - 河田先生版（甲14の1・2）</option>
+              <option value="ev-hohohosha">証拠説明書 - 方々社専用</option>
+              <option value="ev-blue">証拠説明書 - ブルーコーナー専用</option>
+              <option value="ev-nacha">証拠説明書 - ナチュ（分割販売）</option>
+              <option value="ev-mka">証拠説明書 - エムケイエイチ専用</option>
+              <option value="ev-kspro">証拠説明書 - KSプロ専用</option>
             </optgroup>
           </select>
           <div id="template-preview" class="template-body" style="margin-top: 16px; min-height: 80px; white-space: pre-wrap; font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 11px; line-height: 1.8; padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; color: var(--muted);">テンプレートを選択するとここに表示されます。●部分を編集して使用してください。</div>
@@ -1216,12 +1216,26 @@
         locationInput.value = itemName;
       }
       modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // スクロールを防ぐ
       ta.focus();
     }
 
     function closeFeedbackModal() {
       const modal = document.getElementById('feedback-modal');
-      if (modal) modal.style.display = 'none';
+      const overlay = document.getElementById('feedbackModalOverlay');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+          if (overlay.style.display !== 'none') {
+            overlay.style.display = 'none';
+          }
+        }, 200);
+      }
+      // スクロールを復元
+      document.body.style.overflow = '';
     }
 
     function submitFeedback() {
@@ -1981,6 +1995,32 @@
     document.getElementById('full-doc-type')?.addEventListener('change', function() {
       setDocType(this.value);
     });
+
+    // テキストエリアの自動高さ調整機能
+    function autoExpandTextarea(element) {
+      if (!element) return;
+      element.style.height = 'auto';
+      const newHeight = Math.min(element.scrollHeight, 400);
+      element.style.height = newHeight + 'px';
+    }
+
+    // すべてのtextareaに自動拡張機能を適用
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('textarea').forEach(ta => {
+        // 初期化時に一度調整
+        autoExpandTextarea(ta);
+        
+        // 入力時に調整
+        ta.addEventListener('input', function() {
+          autoExpandTextarea(this);
+        });
+        
+        // ペースト時に調整
+        ta.addEventListener('paste', function() {
+          setTimeout(() => autoExpandTextarea(this), 10);
+        });
+      });
+    });
   </script>
 
   <!-- ========== 作成依頼テキスト生成モーダル ========== -->
@@ -2156,9 +2196,10 @@
     cursor: pointer;
     font-size: 24px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 9998;
+    z-index: 999;
     transition: all 0.3s ease;
   }
   .feedback-float-btn:hover {
@@ -2167,6 +2208,14 @@
   }
   .feedback-float-btn:active {
     transform: scale(0.95);
+  }
+  
+  /* モーダル表示時はフィードバックボタンを隠す */
+  .feedback-modal-overlay.active ~ .feedback-float-btn,
+  body:has(#feedback-modal[style*="display: flex"]) .feedback-float-btn,
+  body:has(#requestTextModal[style*="display:flex"]) .feedback-float-btn {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* フィードバックモーダル */
@@ -2384,20 +2433,24 @@
     }
 
     // モーダルを開く
-    window.openFeedbackModal = function() {
+    window.openFeedbackModal = function(itemName) {
       const modal = document.getElementById('feedbackModalOverlay');
       if (modal) {
         modal.classList.add('active');
+        modal.style.display = 'flex';
         document.getElementById('feedbackForm').reset();
         document.getElementById('feedbackStatus').style.display = 'none';
         
-        const pageName = document.title.split('—')[0].trim();
+        const pageName = itemName || document.title.split('—')[0].trim();
         document.getElementById('feedbackLocation').value = pageName;
         
         const savedName = localStorage.getItem('feedback_user_name');
         if (savedName) {
           document.getElementById('feedbackName').value = savedName;
         }
+        
+        // スクロールを防ぐ
+        document.body.style.overflow = 'hidden';
       }
     };
 
@@ -2406,7 +2459,14 @@
       const modal = document.getElementById('feedbackModalOverlay');
       if (modal) {
         modal.classList.remove('active');
+        setTimeout(() => {
+          if (modal.style.display !== 'none') {
+            modal.style.display = 'none';
+          }
+        }, 200);
       }
+      // スクロールを復元
+      document.body.style.overflow = '';
     };
 
     // オーバーレイクリックで閉じる
